@@ -1,3 +1,13 @@
+user: u9vn3p2u3erme7
+pass : pa23bc72880e52b217b3481b0157bf9c8c4899a3f446908fee8210d8e5c84a024
+host:  c4717h2lt37nua.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com
+dbname : dcuf5o6a8qm20v
+schema : ACT
+
+postgres://u9vn3p2u3erme7:pa23bc72880e52b217b3481b0157bf9c8c4899a3f446908fee8210d8e5c84a024@c4717h2lt37nua.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dcuf5o6a8qm20v
+
+
+
 CREATE TABLE "ACT"."USERS" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
