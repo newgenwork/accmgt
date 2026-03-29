@@ -12,15 +12,10 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "empact", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-@Data                   // Lombok: getters, setters, toString, equals, hashCode
-@NoArgsConstructor      // Lombok: no-args constructor
-@AllArgsConstructor     // Lombok: all-args constructor
-@Builder                // Lombok: builder pattern
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @Column(name = "first_name")
     private String firstName;
@@ -32,6 +27,54 @@ public class Employee {
     private String config;
     @Column(name = "enable")
     private String enable;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
+    }
 
 
 

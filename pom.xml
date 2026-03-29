@@ -13,9 +13,12 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring Login and Registration</name>
 	<description>Demo project for Spring Boot</description>
+
+
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,8 +72,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 
-			<version>1.18.30</version>
-
+			<version>1.18.34</version>
 		</dependency>
 
 	</dependencies>
