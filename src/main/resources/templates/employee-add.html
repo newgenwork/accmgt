@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Employee</title>
+</head>
+<body>
+
+<h2>Add Employee</h2>
+
+<form th:action="@{/employees/add}" th:object="${employee}" method"text" th:field="*{firstName}" /> <br/><br/>
+
+<label>Last Name:</label>
+<input type="text" th:field="*{lastName}" /> <br/><br/>
+
+<label>Email:</label>
+<input type="email" th:field="*{email}" /> <br/><br/>
+
+<label>Config:</label>
+<input type="text" th:field="*{config}" /> <br/><br/>
+
+<label>Enable:</label>
+<select th:field="*{enable}">
+    <option value="Y">Yes</option>
+    <option value="N">No</option>
+</select>
+<br/><br/>
+
+<button type="submit">Save Employee</button>
+</form>
+
+</body>
+</html>
