@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("api/v1/")
-@RequiredArgsConstructor
 public class MainController {
 
-    private final EmployeeRepository employeeRepository;
+    private  final EmployeeRepository employeeRepository ;
+
+
+    public MainController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
