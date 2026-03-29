@@ -2,7 +2,7 @@ package com.act.web.controller;
 
 import com.act.model.Employee;
 import com.act.repo.EmployeeRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
