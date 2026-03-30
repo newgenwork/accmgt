@@ -22,23 +22,20 @@
     <div class="row  justify-content-center">
         <div class="col-md-6 col-md-offset-3">
 
-            <h1>View Employees</h1>
+            <h1>View Invoice Master</h1>
 
             <table border="1">
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Config</th>
-                    <th>Enable</th>
+                    <th>reference</th>
+                    <th>Date</th>
                 </tr>
 
-                <tr th:each="emp : ${employees}">
-                    <td th:text="${emp.id}"></td>
-                    <td th:text="${emp.firstName + ' ' + emp.lastName}"></td>
-                    <td th:text="${emp.email}"></td>
-                    <td th:text="${emp.config}"></td>
-                    <td th:text="${emp.enable}"></td>
+                <tr th:each="inv : ${invoiceMasterList}">
+                    <td th:text="${inv.getId()}"></td>
+                    <td th:text="${inv.getReference()}"></td>
+                    <td th:text="${inv.getinvoiceDate()}"></td>
+
                 </tr>
             </table>
 

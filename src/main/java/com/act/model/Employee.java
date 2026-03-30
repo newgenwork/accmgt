@@ -2,7 +2,9 @@ package com.act.model;
 
 
 import javax.persistence.*;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -22,6 +24,13 @@ public class Employee {
     private String config;
     @Column(name = "enable")
     private String enable;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal balance;
+
+
+
+    @Column(nullable = false)
+    private LocalDateTime balanceUpdateDate;
 
     public Long getId() {
         return id;
@@ -70,8 +79,20 @@ public class Employee {
     public void setEnable(String enable) {
         this.enable = enable;
     }
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
 
 
+    public LocalDateTime getBalanceUpdateDate() {
+        return balanceUpdateDate;
+    }
 
-
+    public void setBalanceUpdateDate(LocalDateTime balanceUpdateDate) {
+        this.balanceUpdateDate = balanceUpdateDate;
+    }
 }
