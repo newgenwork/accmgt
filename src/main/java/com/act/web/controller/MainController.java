@@ -1,8 +1,8 @@
 package com.act.web.controller;
 
-import com.act.model.Employee;
+import com.act.model.Ledger;
 import com.act.model.InvoiceMaster;
-import com.act.repo.EmployeeRepository;
+import com.act.repo.LedgerRepository;
 
 import com.act.repo.InvoiceMasterRepository;
 import org.springframework.stereotype.Controller;
@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("api/v1/")
 public class MainController {
 
-    private  final EmployeeRepository employeeRepository ;
+    private  final LedgerRepository ledgerRepository ;
     private final InvoiceMasterRepository invoiceMasterRepository ;
 
-    public MainController(EmployeeRepository employeeRepository, InvoiceMasterRepository invoiceMasterRepository) {
-        this.employeeRepository = employeeRepository;
+    public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository) {
+        this.ledgerRepository = ledgerRepository;
         this.invoiceMasterRepository = invoiceMasterRepository;
     }
 
@@ -43,47 +44,47 @@ public class MainController {
 
     //employees
     // Show form
-    @GetMapping("/employees/add")
-    public String showAddEmployeeForm(Model model) {
-        model.addAttribute("employee", new Employee());
-        return "employee-add";
+    @GetMapping("/ledger/add")
+    public String showAddLedgerForm(Model model) {
+        model.addAttribute("ledger", new Ledger());
+        return "ledger-add";
     }
 
     // Handle submit
-    @PostMapping("/employees/add")
-    public String saveEmployee(@ModelAttribute Employee employee) {
-        Optional<Employee> t = employeeRepository.findByEmail(employee.getEmail());
+    @PostMapping("/ledger/add")
+    public String saveLedger(@ModelAttribute Ledger ledger) {
+        Optional<Ledger> t = ledgerRepository.findByLedgerName(ledger.getLedgerName());
         if (t.isPresent()) {
-            t.get().setConfig(employee.getConfig());
-            t.get().setEnable(employee.getEnable());
-            t.get().setFirstName(employee.getFirstName());
-            t.get().setLastName(employee.getLastName());
-            employeeRepository.save(t.get());
+            t.get().setConfig(ledger.getConfig());
+            t.get().setEnable(ledger.getEnable());
+
+            ledgerRepository.save(t.get());
         } else {
-            employee.setBalance(new BigDecimal(0));
-            employee.setBalanceUpdateDate(LocalDateTime.now());
-            employeeRepository.save(employee);
+            ledger.setBalance(new BigDecimal(0));
+            ledger.setBalanceUpdateDate(LocalDateTime.now());
+            ledgerRepository.save(ledger);
         }
         //return "redirect:/employees";  // redirect to list page
-        return "redirect:/api/v1/employees";
+        return "redirect:/api/v1/ledger/list";
 
     }
 
 
-    @GetMapping("/employees")
-    public String listEmployees(Model model) {
-        model.addAttribute("employees", employeeRepository.findAll());
-        return "enployeeList";
+    @GetMapping("/ledger/list")
+    public String listLedgers(Model model) {
+        model.addAttribute("ledgers", ledgerRepository.findAll());
+        return "ledger-List";
     }
 
-    //Client
-
-    //Vendor
 
     //InvoiceMaster
     @GetMapping("/invoicesMaster/add")
     public String showAddInvoiceForm(Model model) {
-        model.addAttribute("employee", new Employee());
+        model.addAttribute("invoiceMaster", new InvoiceMaster());
+
+        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndType("N","Asset");
+        model.addAttribute("clients", clients.get());
+
         return "invoiceMaster-add";
     }
 
@@ -99,14 +100,14 @@ public class MainController {
             invoiceMasterRepository.save(invoiceMaster);
         }
         //return "redirect:/employees";  // redirect to list page
-        return "redirect:/api/v1/invoicesMasterList";
+        return "redirect:/api/v1/invoicesMaster/list?success";
     }
 
 
-    @GetMapping("/invoicesMasterList")
+    @GetMapping("/invoicesMaster/list")
     public String listMasterList(Model model) {
         model.addAttribute("invoiceMasterList", invoiceMasterRepository.findAll());
-        return "invoicesMasterList";
+        return "invoicesMaster-List";
     }
 
 

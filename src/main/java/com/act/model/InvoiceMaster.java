@@ -1,6 +1,8 @@
 package com.act.model;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,11 +21,14 @@ public class InvoiceMaster {
     private String reference;
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate invoiceDate;
+
+
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    private Ledger client;
 
 
     @OneToMany(mappedBy = "invoiceMaster", cascade = CascadeType.ALL)
@@ -55,5 +60,11 @@ public class InvoiceMaster {
     public List<InvoiceDetail> getDetails() { return details; }
 
     public void setDetails(List<InvoiceDetail> details) { this.details = details; }
+    public Ledger getClient() {
+        return client;
+    }
 
+    public void setClient(Ledger client) {
+        this.client = client;
+    }
 }

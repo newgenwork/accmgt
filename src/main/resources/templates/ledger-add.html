@@ -22,7 +22,7 @@
     <div class="row  justify-content-center">
         <div class="col-md-6 col-md-offset-3">
 
-            <h1>Add Employee</h1>
+            <h1>Add Ledger</h1>
 
             <!--Successful Registration-->
             <div th:if="${param.success}">
@@ -31,43 +31,57 @@
                 </div>
             </div>
 
-            <form th:action="@{/api/v1/employees/add}" method="post" >
+            <form th:action="@{/api/v1/ledger/add}" method="post" >
                 <div class="form-group">
                     <label class="control-label" for="firstName">
-                        First Name
+                        Ledger Name
                     </label>
-                    <input id="firstName" class="form-control" th:field="*{employee.firstName}" required autofocus="autofocus">
+                    <input id="firstName" class="form-control" th:field="*{ledger.ledgerName}" required autofocus="autofocus">
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label" for="lastName">
-                        Last Name
-                    </label>
-                    <input id="lastName" class="form-control" th:field="*{employee.lastName}" required autofocus="autofocus">
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label" for="email">
-                        Email
-                    </label>
-                    <input id="email" class="form-control" th:field="*{employee.email}" required autofocus="autofocus">
-                </div>
 
                 <div class="form-group">
                     <label class="control-label" for="config">
                         Config
                     </label>
-                        <textarea  id="config" class="form-control" th:field="*{employee.config}" required autofocus="autofocus"rows="4" cols="30"></textarea>
+                        <textarea  id="config" class="form-control" th:field="*{ledger.config}" required autofocus="autofocus"rows="4" cols="30"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="isEmployee">
+                        isEmployee
+                    </label>
+                    <select id="isEmployee" class="form-control" th:field="*{ledger.isEmployee}"  required autofocus="autofocus">
+
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </select>
+
                 </div>
 
                 <div class="form-group">
                     <label class="control-label" for="enable">
                         Enable Flag
                     </label>
-                    <select id="enable" class="form-control" th:field="*{employee.enable}"  required autofocus="autofocus">
+                    <select id="enable" class="form-control" th:field="*{ledger.enable}"  required autofocus="autofocus">
 
                     <option value="Y">Yes</option>
                     <option value="N">No</option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="ledger Type">
+                        Ledger Type
+                    </label>
+                    <select id="ledger Type" class="form-control" th:field="*{ledger.type}"  required autofocus="autofocus">
+
+                        <option value="Equity">Equity</option>
+                        <option value="liability">liability</option>
+                        <option value="Asset">Asset</option>
+                        <option value="Expense">Expense</option>
+
                     </select>
 
                 </div>

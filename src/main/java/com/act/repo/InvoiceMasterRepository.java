@@ -1,7 +1,7 @@
 package com.act.repo;
 
 
-import com.act.model.Employee;
+import com.act.model.Ledger;
 import com.act.model.InvoiceMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -31,13 +31,13 @@
 
 
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/employees}">View Employees</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list}">View Ledger</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/employees/add}">Add Employee</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/add}">Add Ledger</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMasterList}">View Invoices Masters</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/list}">View Invoices Masters</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/add}">Add Invoice Master</a></li>

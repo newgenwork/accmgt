@@ -1,6 +1,7 @@
 package com.act.model;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -9,15 +10,14 @@ public class JournalEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "fromVendor", nullable = false)
-    private Vendor fromVendor;
-
+    private Ledger fromVendor;
     @ManyToOne
     @JoinColumn(name = "toVendor", nullable = false)
-    private Vendor toVendor;
-
+    private Ledger toVendor;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
     @Column(nullable = false)
     private LocalDate transactionDate;
 }

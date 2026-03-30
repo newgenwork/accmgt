@@ -22,30 +22,31 @@
     <div class="row  justify-content-center">
         <div class="col-md-6 col-md-offset-3">
 
-            <h1>View Employees</h1>
+            <h1>View Ledger</h1>
 
             <table border="1">
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>Ledger Name</th>
+                    <th>isEmployee</th>
                     <th>Balance</th>
                     <th>Balance update Time</th>
 
                     <th>Config</th>
                     <th>Enable</th>
+                    <th>Type</th>
                 </tr>
 
-                <tr th:each="emp : ${employees}">
-                    <td th:text="${emp.id}"></td>
-                    <td th:text="${emp.firstName + ' ' + emp.lastName}"></td>
-                    <td th:text="${emp.email}"></td>
-                    <td th:text="${emp.getBalance()}"></td>
-                    <td th:text="${emp.getBalanceUpdateDate()}"></td>
+                <tr th:each="ledger : ${ledgers}">
+                    <td th:text="${ledger.id}"></td>
+                    <td th:text="${ledger.getLedgerName()}"></td>
+                    <td th:text="${ledger.isEmployee}"></td>
+                    <td th:text="${ledger.getBalance()}"></td>
+                    <td th:text="${ledger.getBalanceUpdateDate()}"></td>
 
-                    <td th:text="${emp.config}"></td>
-                    <td th:text="${emp.enable}"></td>
-
+                    <td th:text="${ledger.config}"></td>
+                    <td th:text="${ledger.enable}"></td>
+                    <td th:text="${ledger.type}"></td>
                 </tr>
             </table>
 
