@@ -11,5 +11,6 @@ public interface LedgerRepository extends JpaRepository<Ledger, Long> {
     Optional<Ledger> findByLedgerName(String ledgerName);
 
     Optional<Ledger> findByIsEmployeeAndType(String isEmployee, String type);
+    Optional<Ledger> findByType( String type);
 
 }

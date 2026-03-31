@@ -1,7 +1,9 @@
 package com.act.web.controller;
 
+import com.act.model.JournalEntry;
 import com.act.model.Ledger;
 import com.act.model.InvoiceMaster;
+import com.act.repo.JournalEntryRepository;
 import com.act.repo.LedgerRepository;
 
 import com.act.repo.InvoiceMasterRepository;
@@ -23,10 +25,12 @@ public class MainController {
 
     private  final LedgerRepository ledgerRepository ;
     private final InvoiceMasterRepository invoiceMasterRepository ;
+    private final JournalEntryRepository journalEntryRepository ;
 
-    public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository) {
+    public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository, JournalEntryRepository journalEntryRepository) {
         this.ledgerRepository = ledgerRepository;
         this.invoiceMasterRepository = invoiceMasterRepository;
+        this.journalEntryRepository = journalEntryRepository;
     }
 
 
@@ -57,7 +61,9 @@ public class MainController {
         if (t.isPresent()) {
             t.get().setConfig(ledger.getConfig());
             t.get().setEnable(ledger.getEnable());
-
+            //t.get().setBalance(ledger.getBalance());
+            t.get().setType(ledger.getType());
+            t.get().setIsEmployee(ledger.getIsEmployee());
             ledgerRepository.save(t.get());
         } else {
             ledger.setBalance(new BigDecimal(0));
@@ -110,5 +116,33 @@ public class MainController {
         return "invoicesMaster-List";
     }
 
+
+
+    //journal
+    @GetMapping("/journal/add")
+    public String showAddJournalForm(Model model) {
+        model.addAttribute("journal", new JournalEntry());
+        Optional<Ledger> clients = ledgerRepository.findByType("Expense");
+        model.addAttribute("clients", clients.get());
+
+        //Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndType("N","Liabilities");
+        //model.addAttribute("clients", clients.get());
+
+        return "journal-add";
+    }
+
+    // Handle submit
+    @PostMapping("/journal/add")
+    public String saveJournal(@ModelAttribute JournalEntry journalEntry) {
+        journalEntryRepository.save(journalEntry);
+        return "redirect:/api/v1/journal/list?success";
+    }
+
+
+    @GetMapping("/journal/list")
+    public String listJournalList(Model model) {
+        model.addAttribute("journalList", journalEntryRepository.findAll());
+        return "journal-List";
+    }
 
 }

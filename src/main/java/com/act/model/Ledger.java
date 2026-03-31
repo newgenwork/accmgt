@@ -17,7 +17,7 @@ public class Ledger {
 
     @Column(name = "ledgerName")
     private String ledgerName;
-    @Column(name = "config")
+    @Column(name = "config" , length = 2000)
     private String config;
     @Column(name = "enable")
     private String enable;
