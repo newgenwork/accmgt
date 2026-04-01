@@ -1,5 +1,9 @@
 package com.act.web.controller;
 
+import com.act.json.model.Config;
+import com.act.json.model.Event;
+import com.act.json.model.EventAction;
+import com.act.json.model.LocalDateAdapter;
 import com.act.model.JournalEntry;
 import com.act.model.Ledger;
 import com.act.model.InvoiceMaster;
@@ -7,6 +11,8 @@ import com.act.repo.JournalEntryRepository;
 import com.act.repo.LedgerRepository;
 
 import com.act.repo.InvoiceMasterRepository;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,7 +142,47 @@ public class MainController {
     // Handle submit
     @PostMapping("/journal/add")
     public String saveJournal(@ModelAttribute JournalEntry journalEntry) {
-        journalEntryRepository.save(journalEntry);
+        //from
+        //Optional<Ledger> client = ledgerRepository.f
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .setPrettyPrinting()
+                .create();
+
+        Config config = gson.fromJson( journalEntry.getToAccount().getConfig(), Config.class);
+
+        Iterator<Event> it = config.getEvents().iterator();
+
+        Event toApply = null;
+        while (it.hasNext()) {
+            Event event = it.next();
+            if (event.getName().equals(journalEntry.getType()) ) {
+                LocalDate today = LocalDate.now();   // Current date
+                boolean isBetween =  (!today.isBefore(event.getEventConfig().getValidFrom()) )
+                && ( !today.isAfter(event.getEventConfig().getValidTo()) );
+                if (isBetween) {
+                    toApply = event;
+                    break;
+                }
+            }
+        }
+        if (toApply!=null) {
+            Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
+            while (itAction.hasNext()) {
+                EventAction ea = itAction.next();
+                JournalEntry je = new JournalEntry();
+                je.setTransactionDate(journalEntry.getTransactionDate());
+                if (ea.getType().equals("source")){
+                    je.setAmount(journalEntry.getAmount());
+                }
+                je.setFromAccount(ledgerRepository.findByLedgerName(ea.getFromLedgerName()).get());
+                je.setToAccount(ledgerRepository.findByLedgerName(ea.getToLedgerName()).get());
+                je.setType(ea.getType());
+                je.setDescription(journalEntry.getDescription());
+                journalEntryRepository.save(je);
+            }
+        }
+        //journalEntryRepository.save(journalEntry);
         return "redirect:/api/v1/journal/list?success";
     }
 

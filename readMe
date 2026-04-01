@@ -1,10 +1,7 @@
 user: u9vn3p2u3erme7
-pass : pa23bc72880e52b217b3481b0157bf9c8c4899a3f446908fee8210d8e5c84a024
-host:  c4717h2lt37nua.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com
-dbname : dcuf5o6a8qm20v
-schema : ACT
+pass: pa23bc72880e52b217b3481b0157bf9c8c4899a3f446908fee8210d8e5c84a024
 
-postgres://u9vn3p2u3erme7:pa23bc72880e52b217b3481b0157bf9c8c4899a3f446908fee8210d8e5c84a024@c4717h2lt37nua.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dcuf5o6a8qm20v
+
 
 
 
@@ -18,3 +15,50 @@ CREATE TABLE "ACT"."USERS" (
 
 CREATE INDEX idx_user_email ON "ACT"."USERS"(email);
 
+
+
+  <th>transactionDate</th>
+            <th>type</th>
+
+            <th>fromAccount</th>
+            <th>toAccount</th>
+            <th>description</th>
+            <th>amount</th>
+
+Expenses For vendor 
+   {
+  "events": [
+    {
+      "name": "Non Client Billable Hrs Payment to AP",
+      "eventConfig": {
+        "validFrom": "2026-03-31",
+        "validTo": "2027-03-31",
+        "eventAction": [
+          {
+            "fromLedgerName": "Cash/Bank",
+            "toLedgerName": "Manikandan Employee - AP",
+            "type": "source",
+            "amountRatePerHour": 0,
+            "fixedAmount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Release Payment to Vendor/Candidate",
+      "eventConfig": {
+        "validFrom": "2026-03-31",
+        "validTo": "2027-03-31",
+        "eventAction": [
+          {
+            "fromLedgerName": "Manikandan Employee - AP",
+            "toLedgerName": "Manikandan Employee",
+            "type": "source",
+            "amountRatePerHour": 0,
+            "fixedAmount": 0
+          }
+        ]
+      }
+    }
+  ]
+}

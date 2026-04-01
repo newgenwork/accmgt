@@ -1,5 +1,7 @@
 package com.act.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,6 +47,7 @@ public class JournalEntry {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate transactionDate;
 
 
