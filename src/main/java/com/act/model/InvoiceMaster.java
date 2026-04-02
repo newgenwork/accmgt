@@ -24,7 +24,8 @@ public class InvoiceMaster {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate invoiceDate;
 
-
+    @Column(nullable = false)
+    private String status;   //DRAFT, SUBMITTED, PAID
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
@@ -66,5 +67,13 @@ public class InvoiceMaster {
 
     public void setClient(Ledger client) {
         this.client = client;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

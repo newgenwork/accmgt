@@ -33,10 +33,10 @@
 
             <form th:action="@{/api/v1/ledger/add}" method="post" >
                 <div class="form-group">
-                    <label class="control-label" for="firstName">
+                    <label class="control-label" for="ledgerName">
                         Ledger Name
                     </label>
-                    <input id="firstName" class="form-control" th:field="*{ledger.ledgerName}" required autofocus="autofocus">
+                    <input id="ledgerName" class="form-control" th:field="*{ledger.ledgerName}" required autofocus="autofocus">
                 </div>
 
 
@@ -76,15 +76,48 @@
                         Ledger Type
                     </label>
                     <select id="ledger Type" class="form-control" th:field="*{ledger.type}"  required autofocus="autofocus">
-
                         <option value="Equity">Equity</option>
                         <option value="Liability">Liability</option>
                         <option value="Asset">Asset</option>
                         <option value="Expense">Expense</option>
-
+                        <option value="Income">Income</option>
                     </select>
 
                 </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="invoiceRate">
+                        invoiceRate
+                    </label>
+                    <input id="invoiceRate" type="number"
+                           step="0.01"
+                           min="0"
+                           placeholder="0.00"  class="form-control" th:field="*{ledger.invoiceRate}"
+                            autofocus="autofocus"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="InvoiceRateValidateFromDate">
+                        Invoice Rate Valid From
+                    </label>
+                    <input id="InvoiceRateValidateFromDate" type="date" class="form-control" th:field="*{ledger.invoiceRateValidateFromDate}"  autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="InvoiceRateValidateToDate">
+                        Invoice Rate Valid To
+                    </label>
+                    <input id="InvoiceRateValidateToDate" type="date" class="form-control" th:field="*{ledger.invoiceRateValidateToDate}"  autofocus="autofocus">
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="label">
+                        Label (Custom)
+                    </label>
+                    <input id="label" class="form-control" th:field="*{ledger.label}" required autofocus="autofocus">
+                </div>
+
+
+
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-success">Submit</button>

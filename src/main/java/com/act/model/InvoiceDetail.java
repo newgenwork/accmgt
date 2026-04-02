@@ -1,10 +1,11 @@
 package com.act.model;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 @Entity
 @Table(name = "invoice_detail_act")
 public class InvoiceDetail {
@@ -13,15 +14,17 @@ public class InvoiceDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_master_id", nullable = false)
     private InvoiceMaster invoiceMaster;
 
-    @Column(nullable = false)
-    private Long employeeId;
+    // ✅ Employee as Ledger
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_ledger_id", nullable = false)
+    private Ledger employee;
 
-    @Column(nullable = false)
-    private Integer noOfHrs;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal noOfHrs;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal rate;
@@ -29,42 +32,77 @@ public class InvoiceDetail {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    public InvoiceDetail() {}
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
 
-    public InvoiceDetail(Long id, InvoiceMaster invoiceMaster, Long employeeId,
-                         Integer noOfHrs, BigDecimal rate, BigDecimal amount) {
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public InvoiceMaster getInvoiceMaster() {
+        return invoiceMaster;
+    }
+
+    public void setInvoiceMaster(InvoiceMaster invoiceMaster) {
         this.invoiceMaster = invoiceMaster;
-        this.employeeId = employeeId;
+    }
+
+    public Ledger getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Ledger employee) {
+        this.employee = employee;
+    }
+
+    public BigDecimal getNoOfHrs() {
+        return noOfHrs;
+    }
+
+    public void setNoOfHrs(BigDecimal noOfHrs) {
         this.noOfHrs = noOfHrs;
+    }
+
+    public BigDecimal getRate() {
+        return rate;
+    }
+
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    // -------- Getters & Setters -------- //
+    public LocalDate getStartDate() {
+        return startDate;
+    }
 
-    public Long getId() { return id; }
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
-    public InvoiceMaster getInvoiceMaster() { return invoiceMaster; }
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
 
-    public void setInvoiceMaster(InvoiceMaster invoiceMaster) { this.invoiceMaster = invoiceMaster; }
-
-    public Long getEmployeeId() { return employeeId; }
-
-    public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
-
-    public Integer getNoOfHrs() { return noOfHrs; }
-
-    public void setNoOfHrs(Integer noOfHrs) { this.noOfHrs = noOfHrs; }
-
-    public BigDecimal getRate() { return rate; }
-
-    public void setRate(BigDecimal rate) { this.rate = rate; }
-
-    public BigDecimal getAmount() { return amount; }
-
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    // Getters & Setters
 }

@@ -33,7 +33,29 @@
 
                 <tr th:each="inv : ${invoiceMasterList}">
                     <td th:text="${inv.getId()}"></td>
-                    <td th:text="${inv.getReference()}"></td>
+
+
+
+
+
+
+
+
+
+
+                    <td>
+
+                        <a th:href="@{/api/v1/invoicesMaster/edit/{reference}(reference=${inv.reference})}"/>
+
+                        <span th:text="${inv.reference}"></span>
+                        </a>
+
+                        </a>
+
+                    </td>
+
+
+
                     <td th:text="${inv.getInvoiceDate()}"></td>
 
                 </tr>

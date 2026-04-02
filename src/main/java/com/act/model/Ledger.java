@@ -1,6 +1,8 @@
 package com.act.model;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,7 +31,20 @@ public class Ledger {
     private String type; //Equity  or liability or Asset or Expense
     @Column(nullable = false)
     private LocalDateTime balanceUpdateDate;
+    @Column(nullable = true, precision = 10, scale = 2)
 
+    private BigDecimal invoiceRate;
+    @Column(nullable = true)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate invoiceRateValidateFromDate;
+
+    @Column(nullable = true)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate invoiceRateValidateToDate;
+
+
+    @Column(nullable = true)
+    private String label;
 
     public Long getId() {
         return id;
@@ -97,4 +112,39 @@ public class Ledger {
     public void setType(String type) {
         this.type = type;
     }
+
+
+    public BigDecimal getInvoiceRate() {
+        return invoiceRate;
+    }
+
+    public void setInvoiceRate(BigDecimal invoiceRate) {
+        this.invoiceRate = invoiceRate;
+    }
+
+    public LocalDate getInvoiceRateValidateFromDate() {
+        return invoiceRateValidateFromDate;
+    }
+
+    public void setInvoiceRateValidateFromDate(LocalDate invoiceRateValidateFromDate) {
+        this.invoiceRateValidateFromDate = invoiceRateValidateFromDate;
+    }
+
+    public LocalDate getInvoiceRateValidateToDate() {
+        return invoiceRateValidateToDate;
+    }
+
+    public void setInvoiceRateValidateToDate(LocalDate invoiceRateValidateToDate) {
+        this.invoiceRateValidateToDate = invoiceRateValidateToDate;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+
 }

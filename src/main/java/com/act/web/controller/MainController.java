@@ -4,6 +4,7 @@ import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
+import com.act.model.InvoiceDetail;
 import com.act.model.JournalEntry;
 import com.act.model.Ledger;
 import com.act.model.InvoiceMaster;
@@ -15,16 +16,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -72,6 +71,10 @@ public class MainController {
             //t.get().setBalance(ledger.getBalance());
             t.get().setType(ledger.getType());
             t.get().setIsEmployee(ledger.getIsEmployee());
+            t.get().setInvoiceRate(ledger.getInvoiceRate());
+            t.get().setInvoiceRateValidateFromDate(ledger.getInvoiceRateValidateFromDate());
+            t.get().setInvoiceRateValidateToDate(ledger.getInvoiceRateValidateToDate());
+            t.get().setLabel(ledger.getLabel());
             ledgerRepository.save(t.get());
         } else {
             ledger.setBalance(new BigDecimal(0));
@@ -90,14 +93,36 @@ public class MainController {
         return "ledger-List";
     }
 
+    @GetMapping("/invoicesMaster/edit/{reference}")
+    public String showEditInvoiceForm(Model model, @PathVariable String reference) {
+        Optional<InvoiceMaster> t = invoiceMasterRepository.findByReference(reference);
+
+        t.get().getDetails().size();
+
+        model.addAttribute("invoiceMaster",t.get());
+
+        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
+        model.addAttribute("clients", clients.get());
+        Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
+        model.addAttribute("employees", employees.get());
+
+
+
+
+        return "invoiceMaster-add";
+    }
 
     //InvoiceMaster
     @GetMapping("/invoicesMaster/add")
     public String showAddInvoiceForm(Model model) {
         model.addAttribute("invoiceMaster", new InvoiceMaster());
 
-        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndType("N","Asset");
+        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
         model.addAttribute("clients", clients.get());
+        Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
+        model.addAttribute("employees", employees.get());
+
+
 
         return "invoiceMaster-add";
     }
@@ -109,8 +134,16 @@ public class MainController {
 
         if (t.isPresent()) {
             t.get().setInvoiceDate(invoiceMaster.getInvoiceDate());
+            t.get().setDetails(invoiceMaster.getDetails());
+            for (InvoiceDetail invd : invoiceMaster.getDetails()) {
+                invd.setInvoiceMaster(t.get());
+            }
+            t.get().setClient(invoiceMaster.getClient());
             invoiceMasterRepository.save(t.get());
         } else {
+            for (InvoiceDetail invd : invoiceMaster.getDetails()) {
+                invd.setInvoiceMaster(t.get());
+            }
             invoiceMasterRepository.save(invoiceMaster);
         }
         //return "redirect:/employees";  // redirect to list page
@@ -179,6 +212,9 @@ public class MainController {
                 je.setToAccount(ledgerRepository.findByLedgerName(ea.getToLedgerName()).get());
                 je.setType(ea.getType());
                 je.setDescription(journalEntry.getDescription());
+                je.getFromAccount().setBalance(je.getFromAccount().getBalance().subtract(je.getAmount()) );
+                je.getToAccount().setBalance(je.getToAccount().getBalance().add(je.getAmount()) );
+
                 journalEntryRepository.save(je);
             }
         }

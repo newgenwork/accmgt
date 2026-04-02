@@ -1,5 +1,6 @@
 package com.act.json.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -8,7 +9,7 @@ public class EventConfig {
 
 
     LocalDate validTo;
-    List<EventAction> eventAction;
+    private List<EventAction> eventAction;
 
     public LocalDate getValidFrom() {
         return validFrom;
@@ -33,4 +34,6 @@ public class EventConfig {
     public void setEventAction(List<EventAction> action) {
         this.eventAction = action;
     }
+
+
 }

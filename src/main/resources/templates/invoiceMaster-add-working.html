@@ -20,7 +20,7 @@
 <h2>Add Invoice</h2>
 
 <form th:action="@{/api/v1/invoicesMaster/add}"
-      th:object="${invoiceMaster}" method="post">
+      th:object="${invoiceMaster}">
 
     <!-- ================= Invoice Header ================= -->
     <fieldset>
@@ -35,13 +35,10 @@
         <br/><br/>
 
         <label>Client:</label>
-
-        <select id="client"  th:field="*{client}" >
+        <select th:field="*{client}" required>
             <option value="">-- Select Client --</option>
-
-            <option
-                    th:each="c : ${clients}"
-                    th:value="${c.id}"
+            <option th:each="c : ${clients}"
+                    th:value="${c}"
                     th:text="${c.ledgerName}">
             </option>
         </select>
@@ -76,13 +73,11 @@
                             required>
                         <option value="">-- Select Employee --</option>
                         <option th:each="e : ${employees}"
-                                th:value="${e.id}"
+                                th:value="${e}"
                                 th:data-rate="${e.invoiceRate}"
                                 th:text="${e.ledgerName}">
                         </option>
                     </select>
-
-
                 </td>
                 <td>
                     <input type="date" name="details[0].startDate" required/>
@@ -119,19 +114,6 @@
     </fieldset>
 
     <br/>
-    <tfoot>
-    <tr>
-        <td colspan="5" style="text-align:right;"><strong>Total Amount:</strong></td>
-        <td>
-            <input type="number"
-                   id="totalAmount"
-                   class="form-control"
-                   step="0.01"
-                   readonly/>
-        </td>
-        <td></td>
-    </tr>
-    </tfoot>
     <button type="submit">Save Invoice</button>
 </form>
 
@@ -215,25 +197,8 @@
 
         row.querySelector('input[name$=".amount"]').value =
             (hrs * rate).toFixed(2);
-
-        updateTotal();
     }
-
-    function updateTotal() {
-        let total = 0;
-        document
-            .querySelectorAll('input[name$=".amount"]')
-            .forEach(input => {
-                total += parseFloat(input.value) || 0;
-            });
-
-        document.getElementById("totalAmount").value =
-            total.toFixed(2);
-    }
-
 </script>
-
-
 
 </body>
 </html>
