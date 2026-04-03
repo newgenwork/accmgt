@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("api/v1/")
@@ -115,7 +112,10 @@ public class MainController {
     //InvoiceMaster
     @GetMapping("/invoicesMaster/add")
     public String showAddInvoiceForm(Model model) {
-        model.addAttribute("invoiceMaster", new InvoiceMaster());
+        InvoiceMaster invoiceMaster = new InvoiceMaster();
+        invoiceMaster.setDetails(new ArrayList<>());
+        invoiceMaster.getDetails().add(new InvoiceDetail());
+        model.addAttribute("invoiceMaster", invoiceMaster);
 
         Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
         model.addAttribute("clients", clients.get());
@@ -134,15 +134,24 @@ public class MainController {
 
         if (t.isPresent()) {
             t.get().setInvoiceDate(invoiceMaster.getInvoiceDate());
-            t.get().setDetails(invoiceMaster.getDetails());
-            for (InvoiceDetail invd : invoiceMaster.getDetails()) {
-                invd.setInvoiceMaster(t.get());
+            /*for (InvoiceDetail vd : invoiceMaster.getDetails()) {
+                vd.setInvoiceMaster(invoiceMaster);
+                vd.setAmount();
+            }*/
+
+            if (invoiceMaster.getDetails()!=null) {
+                for (InvoiceDetail invd : invoiceMaster.getDetails()) {
+                    invd.setInvoiceMaster(t.get());
+                }
+                t.get().setDetails(invoiceMaster.getDetails());
+            } else {
+                t.get().getDetails().clear();
             }
             t.get().setClient(invoiceMaster.getClient());
             invoiceMasterRepository.save(t.get());
         } else {
             for (InvoiceDetail invd : invoiceMaster.getDetails()) {
-                invd.setInvoiceMaster(t.get());
+                invd.setInvoiceMaster(invoiceMaster);
             }
             invoiceMasterRepository.save(invoiceMaster);
         }

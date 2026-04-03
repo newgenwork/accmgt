@@ -69,9 +69,9 @@
             </thead>
 
             <tbody id="lineItems">
-            <tr>
-                <td>
-                    <select name="details[0].employee"
+            <tr th:each="detail, iter : *{details}">
+            <td>
+                    <select th:field="*{details[__${iter.index}__].employee}"
                             onchange="onEmployeeChange(this)"
                             required>
                         <option value="">-- Select Employee --</option>
@@ -85,27 +85,27 @@
 
                 </td>
                 <td>
-                    <input type="date" name="details[0].startDate" required/>
+                    <input type="date" th:field="*{details[__${iter.index}__].startDate}" required/>
                 </td>
                 <td>
-                    <input type="date" name="details[0].endDate" required/>
+                    <input type="date" th:field="*{details[__${iter.index}__].endDate}" required/>
                 </td>
                 <td>
                     <input type="number"
-                           name="details[0].noOfHrs"
+                           th:field="*{details[__${iter.index}__].noOfHrs}"
                            oninput="calcAmount(this)"
                            required/>
                 </td>
                 <td>
                     <input type="number"
                            step="0.01"
-                           name="details[0].rate"
+                           th:field="*{details[__${iter.index}__].rate}"
                            readonly/>
                 </td>
                 <td>
                     <input type="number"
                            step="0.01"
-                           name="details[0].amount"
+                           th:field="*{details[__${iter.index}__].amount}"
                            readonly/>
                 </td>
                 <td>
@@ -139,7 +139,7 @@
 <select id="employeeOptionsTemplate" style="display:none">
     <option value="">-- Select Employee --</option>
     <option th:each="e : ${employees}"
-            th:value="${e}"
+            th:value="${e.id}"
             th:data-rate="${e.invoiceRate}"
             th:text="${e.ledgerName}">
     </option>

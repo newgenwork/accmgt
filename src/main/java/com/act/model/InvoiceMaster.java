@@ -32,8 +32,10 @@ public class InvoiceMaster {
     private Ledger client;
 
 
-    @OneToMany(mappedBy = "invoiceMaster", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "invoiceMaster", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<InvoiceDetail> details;
+
+
 
     public InvoiceMaster() {}
 
