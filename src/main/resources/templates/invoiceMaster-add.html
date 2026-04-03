@@ -147,50 +147,78 @@
 
 <!-- ================= JavaScript ================= -->
 <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // ✅ Recalculate amount for each existing row (edit mode)
+        document.querySelectorAll("#lineItems tr").forEach(row => {
+            const hrsInput = row.querySelector('input[name$=".noOfHrs"]');
+            if (hrsInput) {
+                calcAmount(hrsInput);
+            }
+        });
+
+        // ✅ Ensure total is calculated on load
+        updateTotal();
+    });
+
     let rowIndex = 1;
 
     function addRow() {
         const tbody = document.getElementById("lineItems");
+
+        // ✅ Always calculate the next index dynamically
+        const index = tbody.querySelectorAll("tr").length;
+
         const row = document.createElement("tr");
 
         const employeeOptions =
             document.getElementById("employeeOptionsTemplate").innerHTML;
 
         row.innerHTML = `
-            <td>
-                <select name="details[${rowIndex}].employee"
-                        onchange="onEmployeeChange(this)"
-                        required>
-                    ${employeeOptions}
-                </select>
-            </td>
-            <td><input type="date" name="details[${rowIndex}].startDate" required/></td>
-            <td><input type="date" name="details[${rowIndex}].endDate" required/></td>
-            <td>
-                <input type="number"
-                       name="details[${rowIndex}].noOfHrs"
-                       oninput="calcAmount(this)"
-                       required/>
-            </td>
-            <td>
-                <input type="number"
-                       step="0.01"
-                       name="details[${rowIndex}].rate"
-                       readonly/>
-            </td>
-            <td>
-                <input type="number"
-                       step="0.01"
-                       name="details[${rowIndex}].amount"
-                       readonly/>
-            </td>
-            <td>
-                <button type="button" onclick="removeRow(this)">X</button>
-            </td>
-        `;
+        <td>
+            <select name="details[${index}].employee"
+                    onchange="onEmployeeChange(this)"
+                    required>
+                ${employeeOptions}
+            </select>
+        </td>
+        <td>
+            <input type="date"
+                   name="details[${index}].startDate"
+                   required/>
+        </td>
+        <td>
+            <input type="date"
+                   name="details[${index}].endDate"
+                   required/>
+        </td>
+        <td>
+            <input type="number"
+                   name="details[${index}].noOfHrs"
+                   oninput="calcAmount(this)"
+                   required/>
+        </td>
+        <td>
+            <input type="number"
+                   step="0.01"
+                   name="details[${index}].rate"
+                   readonly/>
+        </td>
+        <td>
+            <input type="number"
+                   step="0.01"
+                   name="details[${index}].amount"
+                   readonly/>
+        </td>
+        <td>
+            <button type="button"
+                    onclick="removeRow(this)">
+                X
+            </button>
+        </td>
+    `;
 
         tbody.appendChild(row);
-        rowIndex++;
     }
 
     function removeRow(btn) {

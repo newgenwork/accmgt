@@ -133,22 +133,49 @@ public class MainController {
         Optional<InvoiceMaster> t = invoiceMasterRepository.findByReference(invoiceMaster.getReference());
 
         if (t.isPresent()) {
-            t.get().setInvoiceDate(invoiceMaster.getInvoiceDate());
-            /*for (InvoiceDetail vd : invoiceMaster.getDetails()) {
-                vd.setInvoiceMaster(invoiceMaster);
-                vd.setAmount();
-            }*/
+            InvoiceMaster invoiceMasterEdit = t.get();
+            invoiceMasterEdit.setInvoiceDate(invoiceMaster.getInvoiceDate());
+
+
+
 
             if (invoiceMaster.getDetails()!=null) {
-                for (InvoiceDetail invd : invoiceMaster.getDetails()) {
-                    invd.setInvoiceMaster(t.get());
+                for (int i = invoiceMaster.getDetails().size() - 1; i >=0; i--) {
+                    if (invoiceMaster.getDetails().get(i).getEmployee() == null) {
+                        invoiceMaster.getDetails().remove(i);
+                    }
+
                 }
-                t.get().setDetails(invoiceMaster.getDetails());
+
+                int index = invoiceMaster.getDetails().size() -1;
+
+                for (int i = invoiceMasterEdit.getDetails().size() - 1; i > index; i--) {
+                    invoiceMasterEdit.getDetails().remove(i);
+                }
+
+                for (int i = 0; i < invoiceMaster.getDetails().size(); i++) {
+                    if (invoiceMaster.getDetails().get(i) != null) {
+                        if (invoiceMasterEdit.getDetails().size() <= i) {
+                            invoiceMasterEdit.getDetails().add(new InvoiceDetail());
+                        }
+                        invoiceMasterEdit.getDetails().get(i).setInvoiceMaster(invoiceMasterEdit);
+                        invoiceMasterEdit.getDetails().get(i).setAmount(invoiceMaster.getDetails().get(i).getAmount());
+                        invoiceMasterEdit.getDetails().get(i).setEmployee(invoiceMaster.getDetails().get(i).getEmployee());
+                        invoiceMasterEdit.getDetails().get(i).setRate(invoiceMaster.getDetails().get(i).getRate());
+                        invoiceMasterEdit.getDetails().get(i).setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
+                        invoiceMasterEdit.getDetails().get(i).setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
+                        invoiceMasterEdit.getDetails().get(i).setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
+                    } else {
+                        break;
+                    }
+                }
+
             } else {
-                t.get().getDetails().clear();
+                invoiceMasterEdit.getDetails().clear();
             }
-            t.get().setClient(invoiceMaster.getClient());
+            invoiceMasterEdit.setClient(invoiceMaster.getClient());
             invoiceMasterRepository.save(t.get());
+
         } else {
             for (InvoiceDetail invd : invoiceMaster.getDetails()) {
                 invd.setInvoiceMaster(invoiceMaster);
