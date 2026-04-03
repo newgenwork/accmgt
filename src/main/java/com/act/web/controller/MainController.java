@@ -4,17 +4,16 @@ import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
-import com.act.model.InvoiceDetail;
-import com.act.model.JournalEntry;
-import com.act.model.Ledger;
-import com.act.model.InvoiceMaster;
+import com.act.model.*;
 import com.act.repo.JournalEntryRepository;
 import com.act.repo.LedgerRepository;
 
 import com.act.repo.InvoiceMasterRepository;
+import com.act.repo.TrasactionRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,11 +29,14 @@ public class MainController {
     private  final LedgerRepository ledgerRepository ;
     private final InvoiceMasterRepository invoiceMasterRepository ;
     private final JournalEntryRepository journalEntryRepository ;
+    private final TrasactionRepository trasactionRepository ;
 
-    public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository, JournalEntryRepository journalEntryRepository) {
+    public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository,
+                          JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository) {
         this.ledgerRepository = ledgerRepository;
         this.invoiceMasterRepository = invoiceMasterRepository;
         this.journalEntryRepository = journalEntryRepository;
+        this.trasactionRepository = trasactionRepository;
     }
 
 
@@ -48,6 +50,18 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/ledger/edit/{id}")
+    public String showEditLedgerForm(Model model, @PathVariable long id) {
+        Optional<Ledger> t = ledgerRepository.findById(id);
+
+
+        model.addAttribute("ledger",t.get());
+
+
+
+
+        return "ledger-add";
+    }
 
 
     //employees
@@ -115,6 +129,7 @@ public class MainController {
         InvoiceMaster invoiceMaster = new InvoiceMaster();
         invoiceMaster.setDetails(new ArrayList<>());
         invoiceMaster.getDetails().add(new InvoiceDetail());
+        invoiceMaster.setReference(UUID.randomUUID().toString());
         model.addAttribute("invoiceMaster", invoiceMaster);
 
         Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
@@ -194,21 +209,30 @@ public class MainController {
     }
 
 
+    @GetMapping("/journal/edit/{id}")
+    public String showEditjournalForm(Model model, @PathVariable String id) {
+        Optional<JournalEntry> t = journalEntryRepository.findById(id);
+        model.addAttribute("journal",t.get());
+        Optional<Ledger> clients = ledgerRepository.findByType("Expense");
+        model.addAttribute("clients", clients.get());
+        return "journal-add";
+    }
 
     //journal
     @GetMapping("/journal/add")
     public String showAddJournalForm(Model model) {
-        model.addAttribute("journal", new JournalEntry());
+        JournalEntry je = new JournalEntry();
+        je.setId(UUID.randomUUID().toString());
+        model.addAttribute("journal", je);
         Optional<Ledger> clients = ledgerRepository.findByType("Expense");
         model.addAttribute("clients", clients.get());
 
-        //Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndType("N","Liabilities");
-        //model.addAttribute("clients", clients.get());
 
         return "journal-add";
     }
 
     // Handle submit
+    @Transactional
     @PostMapping("/journal/add")
     public String saveJournal(@ModelAttribute JournalEntry journalEntry) {
         //from
@@ -218,7 +242,7 @@ public class MainController {
                 .setPrettyPrinting()
                 .create();
 
-        Config config = gson.fromJson( journalEntry.getToAccount().getConfig(), Config.class);
+        Config config = gson.fromJson( journalEntry.getTargetAccount().getConfig(), Config.class);
 
         Iterator<Event> it = config.getEvents().iterator();
 
@@ -239,19 +263,50 @@ public class MainController {
             Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
             while (itAction.hasNext()) {
                 EventAction ea = itAction.next();
-                JournalEntry je = new JournalEntry();
+
+                JournalEntry je = null;
+                Optional<JournalEntry> optJe = journalEntryRepository.findById(journalEntry.getId());
+                if (optJe.isPresent()){
+                    je = optJe.get();
+                } else {
+                    je = new JournalEntry();
+                }
+                je.setId(journalEntry.getId());
                 je.setTransactionDate(journalEntry.getTransactionDate());
                 if (ea.getType().equals("source")){
                     je.setAmount(journalEntry.getAmount());
                 }
-                je.setFromAccount(ledgerRepository.findByLedgerName(ea.getFromLedgerName()).get());
-                je.setToAccount(ledgerRepository.findByLedgerName(ea.getToLedgerName()).get());
-                je.setType(ea.getType());
+                je.setTargetAccount(journalEntry.getTargetAccount());
+
+               je.setType(ea.getType());
                 je.setDescription(journalEntry.getDescription());
-                je.getFromAccount().setBalance(je.getFromAccount().getBalance().subtract(je.getAmount()) );
-                je.getToAccount().setBalance(je.getToAccount().getBalance().add(je.getAmount()) );
 
                 journalEntryRepository.save(je);
+
+                Optional<List<Transaction>> retJeList = trasactionRepository.findByJournalEntry(je);
+
+                if (retJeList.isPresent()) {
+                    Iterator<Transaction> ita = retJeList.get().iterator();
+                    while (ita.hasNext()) {
+                        trasactionRepository.deleteById(ita.next().getId());
+                    }
+                }
+
+                Transaction transaction = new Transaction();
+                transaction.setAccount(ledgerRepository.findByLedgerName(ea.getFromLedgerName()).get());
+                transaction.setAmount(je.getAmount());
+                transaction.setDescription(je.getDescription());
+                transaction.setTransactionDate(je.getTransactionDate());
+                transaction.setJournalEntry(je);
+                trasactionRepository.save(transaction);
+
+                Transaction transactionNew = new Transaction();
+                transactionNew.setAccount(ledgerRepository.findByLedgerName(ea.getToLedgerName()).get());
+                transactionNew.setAmount(je.getAmount().multiply(new BigDecimal(-1)));
+                transactionNew.setDescription(je.getDescription());
+                transactionNew.setTransactionDate(je.getTransactionDate());
+                transactionNew.setJournalEntry(je);
+                trasactionRepository.save(transactionNew);
             }
         }
         //journalEntryRepository.save(journalEntry);

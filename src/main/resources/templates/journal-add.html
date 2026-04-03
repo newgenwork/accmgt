@@ -58,10 +58,10 @@
 
 
                 <div class="form-group">
-                    <label class="control-label" for="toAccount">
+                    <label class="control-label" for="toAccountRequested">
                         to Account
                     </label>
-                    <select id="toAccount" class="form-control" th:field="*{journal.toAccount}" >
+                    <select id="toAccountRequested" class="form-control" th:field="*{journal.targetAccount}" >
                         <option value="">-- Select From Account --</option>
 
                         <option
@@ -80,6 +80,8 @@
 
                     <input id="description"  class="form-control" th:field="*{journal.description}"
                            required autofocus="autofocus"/>
+
+                    <input type="hidden" th:field="*{journal.id}">
 
                 </div>
 

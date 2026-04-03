@@ -28,17 +28,25 @@
                 <tr>
                     <th>ID</th>
                     <th>Date</th>
-                    <th>fromAccount</th>
                     <th>toAccount</th>
                     <th>description</th>
                     <th>amount</th>
                 </tr>
 
                 <tr th:each="journal : ${journalList}">
-                    <td th:text="${journal.getId()}"></td>
+
+                    <td>
+
+                        <a th:href="@{/api/v1/journal/edit/{id}(id=${journal.getId()})}"/>
+
+                        <span th:text="${journal.getId()}"></span>
+                        </a>
+
+                        </a>
+
+                    </td>
                     <td th:text="${journal.getTransactionDate()}"></td>
-                    <td th:text="${journal.getFromAccount().getLedgerName()}"></td>
-                    <td th:text="${journal.getToAccount().getLedgerName()}"></td>
+                    <td th:text="${journal.getTargetAccount().getLedgerName()}"></td>
                     <td th:text="${journal.getDescription()}"></td>
                     <td th:text="${journal.getAmount()}"></td>
                 </tr>
