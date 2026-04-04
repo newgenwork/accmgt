@@ -56,14 +56,14 @@ public class MainController {
                                      JournalEntry journalEntry,
                                      String from, String to, String desc, LocalDate transactionDate) {
         Optional<List<Transaction>> retJeList =null;
-        if (invoiceMaster!=null) {
+        if (invoiceMaster!=null && invoiceMaster.getId() !=null) {
             retJeList = trasactionRepository.findByInvoiceMaster(invoiceMaster);
         }
         if (journalEntry!=null) {
             retJeList = trasactionRepository.findByJournalEntry(journalEntry);
         }
 
-        if (retJeList.isPresent()) {
+        if (retJeList!=null && retJeList.isPresent()) {
             Iterator<Transaction> ita = retJeList.get().iterator();
             while (ita.hasNext()) {
                 trasactionRepository.deleteById(ita.next().getId());
@@ -280,28 +280,7 @@ public class MainController {
             }
             if (action.equals("submit")){
                 invoiceMaster.setStatus("SUBMITTED");
-                Event toApply = getConfigEvent(invoiceMaster.getClient(),"invoice");
-                if (toApply!=null) {
-                    Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
-                    while (itAction.hasNext()) {
-                        EventAction ea = itAction.next();
 
-                        BigDecimal totalAmount =
-                                invoiceMaster.getDetails().stream()
-                                        .map(InvoiceDetail::getAmount)
-                                        .filter(Objects::nonNull)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                        updateBalanceandTransaction(totalAmount,
-                                invoiceMaster,
-                                null,
-                                ea.getFromLedgerName(),
-                                ea.getToLedgerName(),
-                                "invoice",
-                                invoiceMaster.getInvoiceDate());
-
-                    }
-                }
 
             }
 
@@ -311,6 +290,29 @@ public class MainController {
             }
 
             invoiceMasterRepository.save(invoiceMaster);
+            if (action.equals("submit")){
+            Event toApply = getConfigEvent(invoiceMaster.getClient(),"invoice");
+            if (toApply!=null) {
+                Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
+                while (itAction.hasNext()) {
+                    EventAction ea = itAction.next();
+
+                    BigDecimal totalAmount =
+                            invoiceMaster.getDetails().stream()
+                                    .map(InvoiceDetail::getAmount)
+                                    .filter(Objects::nonNull)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    updateBalanceandTransaction(totalAmount,
+                            invoiceMaster,
+                            null,
+                            ea.getFromLedgerName(),
+                            ea.getToLedgerName(),
+                            "invoice",
+                            invoiceMaster.getInvoiceDate());
+
+                }
+            }}
         }
         //return "redirect:/employees";  // redirect to list page
         return "redirect:/api/v1/invoicesMaster/list?success";
