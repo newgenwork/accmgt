@@ -28,6 +28,22 @@ CREATE INDEX idx_user_email ON "ACT"."USERS"(email);
 Expenses For vendor/employee
    {
   "events": [
+   {
+        "name": "invoicePayment",
+        "eventConfig": {
+          "validFrom": "2026-03-31",
+          "validTo": "2027-03-31",
+          "eventAction": [
+            {
+              "fromLedgerName": "Cash/Bank",
+              "toLedgerName": "Manikandan Employee - AP",
+              "type": "amountRatePerHour",
+              "amountRatePerHour": 40,
+              "fixedAmount": 0
+            }
+          ]
+        }
+     },
     {
       "name": "Non Client Billable Hrs Payment to AP",
       "eventConfig": {

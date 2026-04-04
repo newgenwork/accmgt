@@ -5,10 +5,9 @@ import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
 import com.act.model.*;
+import com.act.repo.InvoiceMasterRepository;
 import com.act.repo.JournalEntryRepository;
 import com.act.repo.LedgerRepository;
-
-import com.act.repo.InvoiceMasterRepository;
 import com.act.repo.TrasactionRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,10 +25,10 @@ import java.util.*;
 @RequestMapping("api/v1/")
 public class MainController {
 
-    private  final LedgerRepository ledgerRepository ;
-    private final InvoiceMasterRepository invoiceMasterRepository ;
-    private final JournalEntryRepository journalEntryRepository ;
-    private final TrasactionRepository trasactionRepository ;
+    private final LedgerRepository ledgerRepository;
+    private final InvoiceMasterRepository invoiceMasterRepository;
+    private final JournalEntryRepository journalEntryRepository;
+    private final TrasactionRepository trasactionRepository;
 
     public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository,
                           JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository) {
@@ -54,24 +53,30 @@ public class MainController {
     void updateBalanceandTransaction(BigDecimal totalAmount,
                                      InvoiceMaster invoiceMaster,
                                      JournalEntry journalEntry,
-                                     String from, String to, String desc, LocalDate transactionDate) {
-        Optional<List<Transaction>> retJeList =null;
-        if (invoiceMaster!=null && invoiceMaster.getId() !=null) {
-            retJeList = trasactionRepository.findByInvoiceMaster(invoiceMaster);
-        }
-        if (journalEntry!=null) {
-            retJeList = trasactionRepository.findByJournalEntry(journalEntry);
-        }
+                                     String from,
+                                     String to,
+                                     String desc,
+                                     LocalDate transactionDate,
+                                     boolean skipdeleteTransactions) {
+        if (!skipdeleteTransactions) {
+            Optional<List<Transaction>> retJeList = null;
+            if (invoiceMaster != null && invoiceMaster.getId() != null) {
+                retJeList = trasactionRepository.findByInvoiceMaster(invoiceMaster);
+            }
+            if (journalEntry != null) {
+                retJeList = trasactionRepository.findByJournalEntry(journalEntry);
+            }
 
-        if (retJeList!=null && retJeList.isPresent()) {
-            Iterator<Transaction> ita = retJeList.get().iterator();
-            while (ita.hasNext()) {
-                trasactionRepository.deleteById(ita.next().getId());
+            if (retJeList != null && retJeList.isPresent()) {
+                Iterator<Transaction> ita = retJeList.get().iterator();
+                while (ita.hasNext()) {
+                    trasactionRepository.deleteById(ita.next().getId());
+                }
             }
         }
         Transaction transaction = new Transaction();
         transaction.setAccount(ledgerRepository.findByLedgerName(from).get());
-        transaction.setAmount(totalAmount);
+        transaction.setAmount(totalAmount.multiply(new BigDecimal(-1)));
         transaction.setDescription(desc);
         transaction.setTransactionDate(transactionDate);
         transaction.setInvoiceMaster(invoiceMaster);
@@ -80,13 +85,14 @@ public class MainController {
 
         Transaction transactionNew = new Transaction();
         transactionNew.setAccount(ledgerRepository.findByLedgerName(to).get());
-        transactionNew.setAmount(totalAmount.multiply(new BigDecimal(-1)));
-        transactionNew.setDescription("invoice");
+        transactionNew.setAmount(totalAmount);
+        transactionNew.setDescription(desc);
         transactionNew.setTransactionDate(transactionDate);
-        transaction.setInvoiceMaster(invoiceMaster);
-        transaction.setJournalEntry(journalEntry);
+        transactionNew.setInvoiceMaster(invoiceMaster);
+        transactionNew.setJournalEntry(journalEntry);
         trasactionRepository.save(transactionNew);
     }
+
     Event getConfigEvent(Ledger ledger, String type) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
@@ -100,10 +106,10 @@ public class MainController {
         Event toApply = null;
         while (it.hasNext()) {
             Event event = it.next();
-            if (event.getName().equals(type) ) {
+            if (event.getName().equals(type)) {
                 LocalDate today = LocalDate.now();   // Current date
-                boolean isBetween =  (!today.isBefore(event.getEventConfig().getValidFrom()) )
-                        && ( !today.isAfter(event.getEventConfig().getValidTo()) );
+                boolean isBetween = (!today.isBefore(event.getEventConfig().getValidFrom()))
+                        && (!today.isAfter(event.getEventConfig().getValidTo()));
                 if (isBetween) {
                     toApply = event;
                     break;
@@ -118,9 +124,7 @@ public class MainController {
         Optional<Ledger> t = ledgerRepository.findById(id);
 
 
-        model.addAttribute("ledger",t.get());
-
-
+        model.addAttribute("ledger", t.get());
 
 
         return "ledger-add";
@@ -173,14 +177,12 @@ public class MainController {
 
         t.get().getDetails().size();
 
-        model.addAttribute("invoiceMaster",t.get());
+        model.addAttribute("invoiceMaster", t.get());
 
-        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
+        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
         model.addAttribute("clients", clients.get());
         Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
-
-
 
 
         return "invoiceMaster-add";
@@ -197,11 +199,10 @@ public class MainController {
         invoiceMaster.setStatus("DRAFT");
         model.addAttribute("invoiceMaster", invoiceMaster);
 
-        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N","Asset","AR");
+        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
         model.addAttribute("clients", clients.get());
         Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
-
 
 
         return "invoiceMaster-add";
@@ -210,41 +211,41 @@ public class MainController {
     // Handle submit
     @Transactional
     @PostMapping("/invoicesMaster/add")
-    public String saveInvoiceMaster(@ModelAttribute InvoiceMaster invoiceMaster,@RequestParam("action") String action) {
+    public String saveInvoiceMaster(@ModelAttribute InvoiceMaster invoiceMaster, @RequestParam("action") String action) {
         Optional<InvoiceMaster> t = invoiceMasterRepository.findByReference(invoiceMaster.getReference());
-
+        InvoiceMaster invoiceMasterEdit = null;
         if (t.isPresent()) {
-            InvoiceMaster invoiceMasterEdit = t.get();
+             invoiceMasterEdit = t.get();
             invoiceMasterEdit.setInvoiceDate(invoiceMaster.getInvoiceDate());
-            if (action.equals("save") &&  !invoiceMasterEdit.getStatus().equals("DRAFT")) {
+            if (action.equals("save") && !invoiceMasterEdit.getStatus().equals("DRAFT")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("submit") &&  !invoiceMasterEdit.getStatus().equals("DRAFT")) {
+            if (action.equals("submit") && !invoiceMasterEdit.getStatus().equals("DRAFT")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("receivePayment") &&  !invoiceMasterEdit.getStatus().equals("SUBMITTED")) {
+            if (action.equals("receivePayment") && !invoiceMasterEdit.getStatus().equals("SUBMITTED")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("receivePayment") &&  invoiceMaster.getReceivedDate()==null) {
+            if (action.equals("receivePayment") && invoiceMaster.getReceivedDate() == null) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("submit")){
+            if (action.equals("submit")) {
                 invoiceMaster.setStatus("SUBMITTED");
             }
-            if (action.equals("receivePayment")){
+            if (action.equals("receivePayment")) {
                 invoiceMaster.setStatus("PAID");
                 invoiceMasterEdit.setReceivedDate(invoiceMaster.getReceivedDate());
             }
             invoiceMasterEdit.setStatus(invoiceMaster.getStatus());
-            if (invoiceMaster.getDetails()!=null) {
-                for (int i = invoiceMaster.getDetails().size() - 1; i >=0; i--) {
+            if (invoiceMaster.getDetails() != null) {
+                for (int i = invoiceMaster.getDetails().size() - 1; i >= 0; i--) {
                     if (invoiceMaster.getDetails().get(i).getEmployee() == null) {
                         invoiceMaster.getDetails().remove(i);
                     }
 
                 }
 
-                int index = invoiceMaster.getDetails().size() -1;
+                int index = invoiceMaster.getDetails().size() - 1;
 
                 for (int i = invoiceMasterEdit.getDetails().size() - 1; i > index; i--) {
                     invoiceMasterEdit.getDetails().remove(i);
@@ -271,14 +272,14 @@ public class MainController {
                 invoiceMasterEdit.getDetails().clear();
             }
             invoiceMasterEdit.setClient(invoiceMaster.getClient());
-            invoiceMasterRepository.save(t.get());
+            invoiceMasterRepository.save(invoiceMasterEdit);
 
         } else {
 
-            if (action.equals("receivePayment") &&  !invoiceMaster.getStatus().equals("SUBMITTED")) {
+            if (action.equals("receivePayment") && !invoiceMaster.getStatus().equals("SUBMITTED")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("submit")){
+            if (action.equals("submit")) {
                 invoiceMaster.setStatus("SUBMITTED");
 
 
@@ -290,9 +291,14 @@ public class MainController {
             }
 
             invoiceMasterRepository.save(invoiceMaster);
-            if (action.equals("submit")){
-            Event toApply = getConfigEvent(invoiceMaster.getClient(),"invoice");
-            if (toApply!=null) {
+            invoiceMasterEdit = invoiceMaster;
+
+        }
+
+
+        if (action.equals("submit")) {
+            Event toApply = getConfigEvent(invoiceMasterEdit.getClient(), "invoice");
+            if (toApply != null) {
                 Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
                 while (itAction.hasNext()) {
                     EventAction ea = itAction.next();
@@ -304,16 +310,81 @@ public class MainController {
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     updateBalanceandTransaction(totalAmount,
-                            invoiceMaster,
+                            invoiceMasterEdit,
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
                             "invoice",
-                            invoiceMaster.getInvoiceDate());
+                            invoiceMaster.getInvoiceDate(),
+                            true);
 
                 }
-            }}
+            }
         }
+
+        if (action.equals("receivePayment")) {
+            Event toApply = getConfigEvent(invoiceMasterEdit.getClient(), "invoicePayment");
+            if (toApply != null) {
+                Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
+                while (itAction.hasNext()) {
+                    EventAction ea = itAction.next();
+
+                    BigDecimal totalAmount =
+                            invoiceMaster.getDetails().stream()
+                                    .map(InvoiceDetail::getAmount)
+                                    .filter(Objects::nonNull)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    updateBalanceandTransaction(totalAmount,
+                            invoiceMasterEdit,
+                            null,
+                            ea.getFromLedgerName(),
+                            ea.getToLedgerName(),
+                            "receivePayment",
+                            invoiceMasterEdit.getInvoiceDate(),
+                            true);
+
+                }
+            }
+
+            {
+                Iterator<InvoiceDetail> iterator = invoiceMasterEdit.getDetails().iterator();
+                while (iterator.hasNext()) {
+
+                    InvoiceDetail invd = iterator.next();
+                    Event toApplyLocal = getConfigEvent(invd.getEmployee(), "invoicePayment");
+                    Iterator<EventAction> itAction = toApplyLocal.getEventConfig().getEventAction().iterator();
+                    while (itAction.hasNext()) {
+                        if (toApplyLocal != null) {
+                            EventAction ea = itAction.next();
+
+                            BigDecimal amt = BigDecimal.ZERO;
+                            if (ea.getType().equals("amountRatePerHour")) {
+                                 amt = ea.getAmountRatePerHour().multiply(invd.getNoOfHrs());
+                            }
+
+                            if (amt != null && amt.compareTo(BigDecimal.ZERO) != 0) {
+                                // amt is NOT zero
+                                updateBalanceandTransaction(amt,
+                                        invoiceMasterEdit,
+                                        null,
+                                        ea.getFromLedgerName(),
+                                        ea.getToLedgerName(),
+                                        "receivePayment",
+                                        invoiceMasterEdit.getInvoiceDate(),
+                                        true);
+                            }
+
+                        }
+                    }
+
+
+                }
+            }
+
+        }
+
+
         //return "redirect:/employees";  // redirect to list page
         return "redirect:/api/v1/invoicesMaster/list?success";
     }
@@ -329,7 +400,7 @@ public class MainController {
     @GetMapping("/journal/edit/{id}")
     public String showEditjournalForm(Model model, @PathVariable String id) {
         Optional<JournalEntry> t = journalEntryRepository.findById(id);
-        model.addAttribute("journal",t.get());
+        model.addAttribute("journal", t.get());
         Optional<Ledger> clients = ledgerRepository.findByType("Expense");
         model.addAttribute("clients", clients.get());
         return "journal-add";
@@ -359,27 +430,27 @@ public class MainController {
                 .setPrettyPrinting()
                 .create();
 
-        Config config = gson.fromJson( journalEntry.getTargetAccount().getConfig(), Config.class);
+        Config config = gson.fromJson(journalEntry.getTargetAccount().getConfig(), Config.class);
 
         Iterator<Event> it = config.getEvents().iterator();
 
-        Event toApply = getConfigEvent(journalEntry.getTargetAccount(),journalEntry.getType());
+        Event toApply = getConfigEvent(journalEntry.getTargetAccount(), journalEntry.getType());
 
-        if (toApply!=null) {
+        if (toApply != null) {
             Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
             while (itAction.hasNext()) {
                 EventAction ea = itAction.next();
 
                 JournalEntry je = null;
                 Optional<JournalEntry> optJe = journalEntryRepository.findById(journalEntry.getId());
-                if (optJe.isPresent()){
+                if (optJe.isPresent()) {
                     je = optJe.get();
                 } else {
                     je = new JournalEntry();
                 }
                 je.setId(journalEntry.getId());
                 je.setTransactionDate(journalEntry.getTransactionDate());
-                if (ea.getType().equals("source")){
+                if (ea.getType().equals("source")) {
                     je.setAmount(journalEntry.getAmount());
                 }
                 je.setTargetAccount(journalEntry.getTargetAccount());
@@ -390,11 +461,13 @@ public class MainController {
                 journalEntryRepository.save(je);
 
 
-
-                updateBalanceandTransaction(je.getAmount(),null,
+                updateBalanceandTransaction(je.getAmount(), null,
                         je,
                         ea.getFromLedgerName(),
-                        ea.getToLedgerName(), je.getDescription(), je.getTransactionDate());
+                        ea.getToLedgerName(),
+                        je.getDescription(),
+                        je.getTransactionDate(),
+                        false);
 
             }
         }
