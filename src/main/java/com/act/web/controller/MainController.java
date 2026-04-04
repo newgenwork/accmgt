@@ -340,7 +340,7 @@ public class MainController {
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
-                            "receivePayment",
+                            "receivePayment" +  " from " + invoiceMasterEdit.getClient().getLedgerName(),
                             invoiceMasterEdit.getInvoiceDate(),
                             true);
 
@@ -370,7 +370,7 @@ public class MainController {
                                         null,
                                         ea.getFromLedgerName(),
                                         ea.getToLedgerName(),
-                                        "receivePayment",
+                                        "receivePayment from " + invd.getEmployee().getLedgerName(),
                                         invoiceMasterEdit.getInvoiceDate(),
                                         true);
                             }
