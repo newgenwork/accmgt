@@ -24,6 +24,11 @@ public class InvoiceMaster {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate invoiceDate;
 
+
+    @Column(nullable = true)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate receivedDate;
+
     @Column(nullable = false)
     private String status;   //DRAFT, SUBMITTED, PAID
 
@@ -77,5 +82,13 @@ public class InvoiceMaster {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDate getReceivedDate() {
+        return receivedDate;
+    }
+
+    public void setReceivedDate(LocalDate receivedDate) {
+        this.receivedDate = receivedDate;
     }
 }

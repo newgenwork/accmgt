@@ -86,4 +86,12 @@ public class Transaction {
     public void setJournalEntry(JournalEntry journalEntry) {
         this.journalEntry = journalEntry;
     }
+
+    public InvoiceMaster getInvoiceMaster() {
+        return invoiceMaster;
+    }
+
+    public void setInvoiceMaster(InvoiceMaster invoiceMaster) {
+        this.invoiceMaster = invoiceMaster;
+    }
 }

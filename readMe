@@ -25,7 +25,7 @@ CREATE INDEX idx_user_email ON "ACT"."USERS"(email);
             <th>description</th>
             <th>amount</th>
 
-Expenses For vendor 
+Expenses For vendor/employee
    {
   "events": [
     {
@@ -53,6 +53,45 @@ Expenses For vendor
           {
             "fromLedgerName": "Manikandan Employee - AP",
             "toLedgerName": "Manikandan Employee",
+            "type": "source",
+            "amountRatePerHour": 0,
+            "fixedAmount": 0
+          }
+        ]
+      }
+    }
+  ]
+}
+
+=======AR=======
+
+ {
+  "events": [
+    {
+      "name": "invoice",
+      "eventConfig": {
+        "validFrom": "2026-03-31",
+        "validTo": "2027-03-31",
+        "eventAction": [
+          {
+            "fromLedgerName": "Revenue",
+            "toLedgerName": "Zealtech-AR",
+            "type": "source",
+            "amountRatePerHour": 0,
+            "fixedAmount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "invoicePayment",
+      "eventConfig": {
+        "validFrom": "2026-03-31",
+        "validTo": "2027-03-31",
+        "eventAction": [
+          {
+            "fromLedgerName": "Zealtech-AR",
+            "toLedgerName": "Cash/Bank",
             "type": "source",
             "amountRatePerHour": 0,
             "fixedAmount": 0

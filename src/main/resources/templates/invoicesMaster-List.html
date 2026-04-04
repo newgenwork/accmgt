@@ -29,6 +29,7 @@
                     <th>ID</th>
                     <th>reference</th>
                     <th>Date</th>
+                    <th>Status</th>
                 </tr>
 
                 <tr th:each="inv : ${invoiceMasterList}">
@@ -57,6 +58,8 @@
 
 
                     <td th:text="${inv.getInvoiceDate()}"></td>
+
+                    <td th:text="${inv.getStatus()}"></td>
 
                 </tr>
             </table>
