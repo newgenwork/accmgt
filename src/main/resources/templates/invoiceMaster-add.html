@@ -50,6 +50,10 @@
         <label>Payment Recieved Date:</label>
             <input type="date" th:field="*{receivedDate}" />
         </div>
+        <div th:if="*{status == 'PAID'}">
+            <label>Payment Recieved Date:</label>
+            <input type="text" th:field="*{receivedDate}" readonly/>
+        </div>
         <br/><br/>
         <label>Status:</label>
         <input type="text" th:field="*{status}" readonly/>
