@@ -484,6 +484,14 @@ public class MainController {
         return "journal-add";
     }
 
+
+    //journal
+    @GetMapping("/guide")
+    public String showGuide(Model model) {
+
+
+        return "guide";
+    }
     //journal
     @GetMapping("/journal/add")
     public String showAddJournalForm(Model model) {
