@@ -8,7 +8,6 @@ public class EventAction {
     String toLedgerName;
     String type; //amountRatePerHour or fixedAmount or source
     BigDecimal amountRatePerHour = BigDecimal.ZERO;
-    BigDecimal fixedAmount = BigDecimal.ZERO;
 
 
     public String getType() {
@@ -19,13 +18,7 @@ public class EventAction {
         this.type = type;
     }
 
-    public BigDecimal getFixedAmount() {
-        return fixedAmount;
-    }
 
-    public void setFixedAmount(BigDecimal fixedAmount) {
-        this.fixedAmount = fixedAmount;
-    }
 
     public BigDecimal getAmountRatePerHour() {
         return amountRatePerHour;

@@ -23,6 +23,13 @@
         <div>
 
             <h1>View Invoice Master</h1>
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    You have successfully finished your transaction! ==>
+                    <span th:text="${param.success}"></span>
+                </div>
+            </div>
+
 
             <table class="table table-bordered table-striped table-hover">
                 <thead>

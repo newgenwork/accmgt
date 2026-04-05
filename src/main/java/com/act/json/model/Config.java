@@ -46,7 +46,6 @@ public class Config {
             eventAction.setToLedgerName("Manikandan Employee - AP");
             eventAction.setType("source");
             eventAction.setAmountRatePerHour(BigDecimal.ZERO);
-            eventAction.setFixedAmount(BigDecimal.ZERO);
         }
 
         {
@@ -62,7 +61,6 @@ public class Config {
             eventAction.setToLedgerName("Manikandan Employee");
             eventAction.setType("source");
             eventAction.setAmountRatePerHour(BigDecimal.ZERO);
-            eventAction.setFixedAmount(BigDecimal.ZERO);
         }
 
         String json = gson.toJson(config);

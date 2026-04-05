@@ -78,7 +78,7 @@ public class MainController {
         Transaction transaction = new Transaction();
         transaction.setAccount(ledgerRepository.findByLedgerName(from).get());
         transaction.setAmount(totalAmount.multiply(new BigDecimal(-1)));
-        transaction.setDescription(desc + ":"+ from + "==>" + to);
+        transaction.setDescription(desc + " : flow : "+ from + " ==> " + to);
         transaction.setTransactionDate(transactionDate);
         transaction.setInvoiceMaster(invoiceMaster);
         transaction.setJournalEntry(journalEntry);
@@ -87,7 +87,7 @@ public class MainController {
         Transaction transactionNew = new Transaction();
         transactionNew.setAccount(ledgerRepository.findByLedgerName(to).get());
         transactionNew.setAmount(totalAmount);
-        transaction.setDescription(desc + ":"+ from + "==>" + to);
+        transactionNew.setDescription(desc + " : flow : "+ from + " ==> " + to);
         transactionNew.setTransactionDate(transactionDate);
         transactionNew.setInvoiceMaster(invoiceMaster);
         transactionNew.setJournalEntry(journalEntry);
@@ -189,13 +189,18 @@ public class MainController {
             t.get().setInvoiceRateValidateToDate(ledger.getInvoiceRateValidateToDate());
             t.get().setLabel(ledger.getLabel());
             ledgerRepository.save(t.get());
+            return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
+
         } else {
             ledger.setBalance(new BigDecimal(0));
             ledger.setBalanceUpdateDate(LocalDateTime.now());
             ledgerRepository.save(ledger);
+            return "redirect:/api/v1/ledger/list?success="+ledger.getLedgerName();
+
         }
         //return "redirect:/employees";  // redirect to list page
-        return "redirect:/api/v1/ledger/list";
+//return "redirect:/api/v1/ledger/list?success";
+
 
     }
 
@@ -341,18 +346,19 @@ public class MainController {
                     EventAction ea = itAction.next();
 
                     BigDecimal totalAmount =
-                            invoiceMaster.getDetails().stream()
+                            invoiceMasterEdit.getDetails().stream()
                                     .map(InvoiceDetail::getAmount)
                                     .filter(Objects::nonNull)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                    updateBalanceandTransaction(totalAmount,
+                    updateBalanceandTransaction(
+                            totalAmount,
                             invoiceMasterEdit,
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
-                            "invoice (Submit Event)" ,
-                            invoiceMaster.getInvoiceDate(),
+                            "invoice (Submit Event) : ref : " + invoiceMasterEdit.getReference() ,
+                            invoiceMasterEdit.getInvoiceDate(),
                             true);
 
                 }
@@ -379,12 +385,12 @@ public class MainController {
                             ea.getToLedgerName(),
                             "receivePayment Event (MasterEntry) from "
                                     + invoiceMasterEdit.getClient().getLedgerName()
-                                    + " : "
+                                    + " : ref : "
                                 +invoiceMasterEdit.getReference()
-                                + " : "
+                                + " : inv Date : "
                                 + invoiceMasterEdit.getInvoiceDate()
                                     ,
-                            invoiceMasterEdit.getInvoiceDate(),
+                            invoiceMasterEdit.getReceivedDate(),
                             true);
 
                 }
@@ -413,15 +419,18 @@ public class MainController {
                                         null,
                                         ea.getFromLedgerName(),
                                         ea.getToLedgerName(),
-                                        "receivePayment Event (LineEntry) from : "
+                                        "receivePayment Event (LineEntry) from Name: "
                                                 + invd.getEmployee().getLedgerName()
-                                                + " : "
+                                                + " : Hrs :"
                                                 + invd.getNoOfHrs()
-                                                + " : "
+                                                + " : StartDate : "
                                                 + invd.getStartDate()
-                                                + " : "
-                                                + invd.getEndDate(),
-                                        invoiceMasterEdit.getInvoiceDate(),
+                                                + " : End date : "
+                                                + invd.getEndDate()
+                                                + " : Invoice Ref : "
+                                        +invoiceMasterEdit.getReference(),
+
+                                        invoiceMasterEdit.getReceivedDate(),
                                         true);
                             }
 
@@ -436,13 +445,16 @@ public class MainController {
 
 
         //return "redirect:/employees";  // redirect to list page
-        return "redirect:/api/v1/invoicesMaster/list?success";
+        return "redirect:/api/v1/invoicesMaster/list?success=" + invoiceMasterEdit.getReference();
     }
 
 
     @GetMapping("/invoicesMaster/list")
     public String listMasterList(Model model) {
-        model.addAttribute("invoiceMasterList", invoiceMasterRepository.findAll());
+
+        List<InvoiceMaster> dd = invoiceMasterRepository.findAll();
+        dd.sort(Comparator.comparing(InvoiceMaster::getInvoiceDate).reversed());
+        model.addAttribute("invoiceMasterList", dd);
         return "invoicesMaster-List";
     }
 
@@ -451,7 +463,7 @@ public class MainController {
     public String showEditjournalForm(Model model, @PathVariable String id) {
         Optional<JournalEntry> t = journalEntryRepository.findById(id);
         model.addAttribute("journal", t.get());
-        Optional<Ledger> clients = ledgerRepository.findByType("Expense");
+        Optional<List<Ledger>> clients = ledgerRepository.findByType("Expense");
         model.addAttribute("clients", clients.get());
         return "journal-add";
     }
@@ -462,7 +474,7 @@ public class MainController {
         JournalEntry je = new JournalEntry();
         je.setId(UUID.randomUUID().toString());
         model.addAttribute("journal", je);
-        Optional<Ledger> clients = ledgerRepository.findByType("Expense");
+        Optional<List<Ledger>> clients = ledgerRepository.findByType("Expense");
         model.addAttribute("clients", clients.get());
 
 
@@ -525,7 +537,7 @@ public class MainController {
             }
         }
         //journalEntryRepository.save(journalEntry);
-        return "redirect:/api/v1/journal/list?success";
+        return "redirect:/api/v1/journal/list?success=" +journalEntry.getId();
     }
 
 
