@@ -59,8 +59,12 @@
                         <label for="client">Client</label>
                         <select id="client"
                                 th:field="*{client}"
-                                class="form-control">
-                            <option value="">-- Select Client --</option>
+                                class="form-control"
+                                required>
+                            <option value="" disabled selected>
+                                -- Select Client --
+                            </option>
+
                             <option th:each="c : ${clients}"
                                     th:value="${c.id}"
                                     th:text="${c.ledgerName}">
@@ -76,7 +80,7 @@
                         <label>Payment Received Date</label>
                         <input type="date"
                                th:field="*{receivedDate}"
-                               class="form-control" />
+                               class="form-control" required/>
                     </div>
 
                     <!-- Payment Received Date (PAID) -->
@@ -124,7 +128,9 @@
                             <th class="text-right">Hours</th>
                             <th class="text-right">Invoice Rate</th>
                             <th class="text-right">Amount</th>
+                            <div th:if="*{status != 'PAID' and status != 'SUBMITTED'}">
                             <th class="text-center" style="width: 50px;">Action</th>
+                            </div>
                         </tr>
                         </thead>
 
@@ -187,23 +193,25 @@
                                        class="form-control text-right"
                                        readonly />
                             </td>
-
-                            <!-- Remove -->
-                            <td class="text-center">
-                                <button type="button"
-                                        class="btn btn-sm btn-danger"
-                                        onclick="removeRow(this)">
-                                    ✕
-                                </button>
-                            </td>
+                            <div th:if="*{status != 'PAID' and status != 'SUBMITTED'}">
+                                <!-- Remove -->
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="removeRow(this)">
+                                        ✕
+                                    </button>
+                                </td>
+                            </div>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <button type="button" onclick="addRow()">+ Add Line</button>
+        <div th:if="*{status != 'PAID' and status != 'SUBMITTED'}">
+            <button type="button" onclick="addRow()">+ Add Line</button>
+        </div>
     </fieldset>
 
     <br/>

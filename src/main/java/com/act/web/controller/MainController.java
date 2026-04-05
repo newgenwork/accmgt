@@ -156,6 +156,11 @@ public class MainController {
         }
 
 
+        transactions.sort(
+                Comparator.comparing(TransactionDto::getTransactionDate)
+                        .reversed()
+        );
+
         model.addAttribute("transactions", transactions);
         model.addAttribute("account", t.get().getLedgerName());
         return "statement-list";
@@ -526,7 +531,9 @@ public class MainController {
 
     @GetMapping("/journal/list")
     public String listJournalList(Model model) {
-        model.addAttribute("journalList", journalEntryRepository.findAll());
+        List<JournalEntry> dd = journalEntryRepository.findAll();
+        dd.sort(Comparator.comparing(JournalEntry::getTransactionDate).reversed());
+        model.addAttribute("journalList", dd);
         return "journal-List";
     }
 
