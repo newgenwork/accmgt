@@ -6,12 +6,15 @@ import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
 import com.act.model.*;
-import com.act.repo.InvoiceMasterRepository;
-import com.act.repo.JournalEntryRepository;
-import com.act.repo.LedgerRepository;
-import com.act.repo.TrasactionRepository;
+import com.act.repo.*;
+import com.act.service.impl.UserServiceImpl;
+import com.act.web.dto.MyUserRegistrationDto;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -30,13 +33,17 @@ public class MainController {
     private final InvoiceMasterRepository invoiceMasterRepository;
     private final JournalEntryRepository journalEntryRepository;
     private final TrasactionRepository trasactionRepository;
+    private final UserRepository userRepository;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository,
-                          JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository) {
+                          JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository, UserRepository userRepository) {
         this.ledgerRepository = ledgerRepository;
         this.invoiceMasterRepository = invoiceMasterRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.trasactionRepository = trasactionRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -490,6 +497,9 @@ public class MainController {
         return "journal-add";
     }
 
+
+
+
     // Handle submit
     @Transactional
     @PostMapping("/journal/add")
@@ -559,6 +569,34 @@ public class MainController {
         dd.sort(Comparator.comparing(JournalEntry::getTransactionDate).reversed());
         model.addAttribute("journalList", dd);
         return "journal-List";
+    }
+
+
+    @GetMapping("/user/changeProfile")
+    public String showChangeProfileForm(Model model) {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String username = auth.getName();
+
+        MyUser user = userRepository.findByEmail(username);
+        model.addAttribute("user", user);
+        return "changeProfile";
+    }
+    @Transactional
+    @PostMapping("/user/changeProfile")
+    public String saveChangeProfileForm(@ModelAttribute MyUser user) {
+
+        MyUser myUser = userRepository.findByEmail(user.getEmail());
+        myUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        myUser.setEnabled("true");
+        myUser.setFirstName(user.getFirstName());
+        myUser.setLastName(user.getLastName());
+
+        userRepository.save(myUser);
+        //return "changeProfile?success=" +user.getEmail();
+        return "redirect:/api/v1/user/changeProfile?success=" +user.getEmail();
     }
 
 }

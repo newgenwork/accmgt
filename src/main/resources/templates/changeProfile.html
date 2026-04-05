@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Home Page</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<div class="container">
+		<div th:replace="fragments/header :: header"></div>
+
+
+	</div>
+</nav>
+
+
+
+
+<div class="container">
+	<div class="row  justify-content-center">
+		<div class="col-md-6 col-md-offset-3">
+			<div th:if="${param.success}">
+				<div class="alert alert-info">
+					You have successfully finished your transaction! ==>
+					<span th:text="${param.success}"></span>
+				</div>
+			</div>
+
+			<h1>Change Profile</h1>
+			<form th:action="@{/api/v1/user/changeProfile}" method="post" >
+
+			<div class="form-group">
+				<label class="control-label" for="firstName">
+					First Name
+				</label>
+				<input id="firstName" class="form-control" th:field="*{user.firstName}" required autofocus="autofocus">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label" for="lastName">
+					Last Name
+				</label>
+				<input id="lastName" class="form-control" th:field="*{user.lastName}" required autofocus="autofocus">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label" for="email">
+					Email
+				</label>
+				<input id="email" class="form-control" th:field="*{user.email}" required autofocus="autofocus">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label" for="password">
+					Password
+				</label>
+				<input id="password" class="form-control" th:field="*{user.password}" type="password" required
+					   autofocus="autofocus">
+			</div>
+
+
+
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-success">Submit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+
+</body>
+</html>
