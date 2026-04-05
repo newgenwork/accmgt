@@ -16,7 +16,11 @@ CREATE TABLE "ACT"."USERS" (
 CREATE INDEX idx_user_email ON "ACT"."USERS"(email);
 
 #####registoration password
-asdfasdf@#23#%4354^dgsfgsdfgsfgsdfgsdfgsdfgsdfgsdfgsdfgsdfg354545454545
+1. ask them to register it
+2. use below update to set enabled to true
+select * from public.useract
+update public.useract set enabled  = 'true' where email= 'murugeshsfo@gmail.com'
+3. ask them to change password after login
 #####
 
   <th>transactionDate</th>
