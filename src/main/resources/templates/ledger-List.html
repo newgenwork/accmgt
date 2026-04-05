@@ -52,6 +52,16 @@
                         </a>
 
                     </td>
+                    <td>
+
+                        <a th:href="@{/api/v1/ledger/statement/{id}(id=${ledger.getId()})}"/>
+
+                        <span th:text="Statement"></span>
+                        </a>
+
+                        </a>
+
+                    </td>
                     <td th:text="${ledger.getLedgerName()}"></td>
                     <td th:text="${ledger.isEmployee}"></td>
                     <td th:text="${ledger.getBalance()}"></td>

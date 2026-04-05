@@ -1,5 +1,6 @@
 package com.act.web.controller;
 
+import com.act.dto.TransactionDto;
 import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
@@ -121,15 +122,42 @@ public class MainController {
 
     @GetMapping("/ledger/edit/{id}")
     public String showEditLedgerForm(Model model, @PathVariable long id) {
+
         Optional<Ledger> t = ledgerRepository.findById(id);
-
-
         model.addAttribute("ledger", t.get());
-
-
         return "ledger-add";
     }
+    @GetMapping("/ledger/statement/{id}")
+    public String showStatementLedger(Model model, @PathVariable long id) {
+        Optional<Ledger> t = ledgerRepository.findById(id);
+        Optional<List<Transaction>> to = trasactionRepository.findByAccount(t.get());
 
+        Iterator<Transaction> it = to.get().iterator();
+        List<TransactionDto> transactions = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        while (it.hasNext()) {
+            Transaction tran = it.next();
+            TransactionDto tdto = new TransactionDto();
+            transactions.add(tdto);
+
+            tdto.setAmount(tran.getAmount());
+            tdto.setDescription(tran.getDescription());
+            tdto.setTransactionDate(tran.getTransactionDate());
+
+            if (tran.getInvoiceMaster()!=null) {
+                tdto.setDetails("Invoice : " + tran.getInvoiceMaster().getClient().getLedgerName());
+            }
+            if (tran.getJournalEntry()!=null) {
+                tdto.setDetails("Journal Entry : " + tran.getJournalEntry().getTargetAccount().getLedgerName());
+            }
+            totalAmount = totalAmount.add(tran.getAmount());
+            tdto.setBalance(totalAmount);
+        }
+
+
+        model.addAttribute("transactions", transactions);
+        return "statement-list";
+    }
 
     //employees
     // Show form
@@ -170,6 +198,8 @@ public class MainController {
         model.addAttribute("ledgers", ledgerRepository.findAll());
         return "ledger-List";
     }
+
+
 
     @GetMapping("/invoicesMaster/edit/{reference}")
     public String showEditInvoiceForm(Model model, @PathVariable String reference) {

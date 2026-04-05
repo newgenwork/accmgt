@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div th:replace="fragments/header :: header"></div>
+
+
+    </div>
+</nav>
+
+
+
+
+<div class="container">
+    <div class="row  justify-content-center">
+        <div class="col-md-6 col-md-offset-3">
+
+            <h1>View Ledger</h1>
+
+
+
+            <table border="1">
+                <tr>
+                    <th>Date</th>
+                    <th>Desc</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>MoreDetails</th>
+                </tr>
+
+
+
+                <tr th:each="transaction : ${transactions}">
+
+                    <td th:text="${transaction.transactionDate}"></td>
+
+                    <td th:text="${transaction.description}"></td>
+                    <td th:text="${transaction.amount}"></td>
+                    <td th:text="${transaction.balance}"></td>
+
+                    <td th:text="${transaction.details}"></td>
+
+
+
+                </tr>
+            </table>
+
+            <br/>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>
+

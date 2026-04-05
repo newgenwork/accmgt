@@ -14,5 +14,5 @@ public interface TrasactionRepository extends JpaRepository<Transaction, Long> {
 
     Optional<List<Transaction>> findByJournalEntry(JournalEntry journalEntry);
     Optional<List<Transaction>> findByInvoiceMaster(InvoiceMaster invoiceMaster);
-
+    Optional<List<Transaction>> findByAccount(Ledger account);
 }
