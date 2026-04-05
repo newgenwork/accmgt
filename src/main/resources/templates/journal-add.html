@@ -61,15 +61,24 @@
                     <label class="control-label" for="toAccountRequested">
                         to Account
                     </label>
-                    <select id="toAccountRequested" class="form-control" th:field="*{journal.targetAccount}" >
-                        <option value="">-- Select From Account --</option>
+                    <select id="toAccountRequested"
+                            class="form-control"
+                            th:field="*{journal.targetAccount}"
+                            required>
+                        <option value="" disabled selected>
+                            -- Select From Account --
+                        </option>
 
-                        <option
-                                th:each="c : ${clients}"
+                        <option th:each="c : ${clients}"
                                 th:value="${c.id}"
                                 th:text="${c.ledgerName}">
                         </option>
                     </select>
+
+                    <small class="text-danger"
+                           th:if="${#fields.hasErrors('journal.targetAccount')}"
+                           th:errors="*{journal.targetAccount}">
+                    </small>
                 </div>
 
                 <div class="form-group">

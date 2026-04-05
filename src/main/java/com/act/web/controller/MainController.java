@@ -78,7 +78,7 @@ public class MainController {
         Transaction transaction = new Transaction();
         transaction.setAccount(ledgerRepository.findByLedgerName(from).get());
         transaction.setAmount(totalAmount.multiply(new BigDecimal(-1)));
-        transaction.setDescription(desc);
+        transaction.setDescription(desc + ":"+ from + "==>" + to);
         transaction.setTransactionDate(transactionDate);
         transaction.setInvoiceMaster(invoiceMaster);
         transaction.setJournalEntry(journalEntry);
@@ -87,7 +87,7 @@ public class MainController {
         Transaction transactionNew = new Transaction();
         transactionNew.setAccount(ledgerRepository.findByLedgerName(to).get());
         transactionNew.setAmount(totalAmount);
-        transactionNew.setDescription(desc);
+        transaction.setDescription(desc + ":"+ from + "==>" + to);
         transactionNew.setTransactionDate(transactionDate);
         transactionNew.setInvoiceMaster(invoiceMaster);
         transactionNew.setJournalEntry(journalEntry);
@@ -148,7 +148,8 @@ public class MainController {
                 tdto.setDetails("Invoice : " + tran.getInvoiceMaster().getClient().getLedgerName());
             }
             if (tran.getJournalEntry()!=null) {
-                tdto.setDetails("Journal Entry : " + tran.getJournalEntry().getTargetAccount().getLedgerName());
+                tdto.setDetails("Journal Entry : " + tran.getJournalEntry().getTargetAccount().getLedgerName() + ":" +
+                        tran.getJournalEntry().getType())  ;
             }
             totalAmount = totalAmount.add(tran.getAmount());
             tdto.setBalance(totalAmount);
@@ -156,6 +157,7 @@ public class MainController {
 
 
         model.addAttribute("transactions", transactions);
+        model.addAttribute("account", t.get().getLedgerName());
         return "statement-list";
     }
 
@@ -344,7 +346,7 @@ public class MainController {
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
-                            "invoice",
+                            "invoice (Submit Event)" ,
                             invoiceMaster.getInvoiceDate(),
                             true);
 
@@ -370,7 +372,13 @@ public class MainController {
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
-                            "receivePayment" +  " from " + invoiceMasterEdit.getClient().getLedgerName(),
+                            "receivePayment Event (MasterEntry) from "
+                                    + invoiceMasterEdit.getClient().getLedgerName()
+                                    + " : "
+                                +invoiceMasterEdit.getReference()
+                                + " : "
+                                + invoiceMasterEdit.getInvoiceDate()
+                                    ,
                             invoiceMasterEdit.getInvoiceDate(),
                             true);
 
@@ -400,7 +408,14 @@ public class MainController {
                                         null,
                                         ea.getFromLedgerName(),
                                         ea.getToLedgerName(),
-                                        "receivePayment from " + invd.getEmployee().getLedgerName(),
+                                        "receivePayment Event (LineEntry) from : "
+                                                + invd.getEmployee().getLedgerName()
+                                                + " : "
+                                                + invd.getNoOfHrs()
+                                                + " : "
+                                                + invd.getStartDate()
+                                                + " : "
+                                                + invd.getEndDate(),
                                         invoiceMasterEdit.getInvoiceDate(),
                                         true);
                             }
@@ -485,7 +500,7 @@ public class MainController {
                 }
                 je.setTargetAccount(journalEntry.getTargetAccount());
 
-                je.setType(ea.getType());
+                je.setType(journalEntry.getType());
                 je.setDescription(journalEntry.getDescription());
 
                 journalEntryRepository.save(je);
@@ -495,7 +510,10 @@ public class MainController {
                         je,
                         ea.getFromLedgerName(),
                         ea.getToLedgerName(),
-                        je.getDescription(),
+                        je.getDescription() + " : "
+                                + ea.getFromLedgerName() + " : "
+                                + ea.getToLedgerName() + ":"
+                                + je.getTargetAccount().getLedgerName(),
                         je.getTransactionDate(),
                         false);
 

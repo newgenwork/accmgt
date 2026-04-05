@@ -18,52 +18,39 @@
 
 
 
-<div class="container">
-    <div class="row  justify-content-center">
-        <div class="col-md-6 col-md-offset-3">
+<div >
+    <div >
+        <div>
 
             <h1>View Invoice Master</h1>
 
-            <table border="1">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
                 <tr>
                     <th>ID</th>
-                    <th>reference</th>
+                    <th>Reference</th>
                     <th>Date</th>
                     <th>Status</th>
                 </tr>
+                </thead>
 
+                <tbody>
                 <tr th:each="inv : ${invoiceMasterList}">
-                    <td th:text="${inv.getId()}"></td>
-
-
-
-
-
-
-
-
-
+                    <td th:text="${inv.id}"></td>
 
                     <td>
-
                         <a th:href="@{/api/v1/invoicesMaster/edit/{reference}(reference=${inv.reference})}"/>
 
                         <span th:text="${inv.reference}"></span>
                         </a>
 
-                        </a>
-
                     </td>
 
-
-
-                    <td th:text="${inv.getInvoiceDate()}"></td>
-
-                    <td th:text="${inv.getStatus()}"></td>
-
+                    <td th:text="${inv.invoiceDate}"></td>
+                    <td th:text="${inv.status}"></td>
                 </tr>
+                </tbody>
             </table>
-
             <br/>
         </div>
     </div>
