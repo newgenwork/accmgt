@@ -359,6 +359,15 @@
     }
 
     function removeRow(btn) {
+
+        const tbody = document.getElementById("lineItems");
+        const rowCount = tbody.querySelectorAll("tr").length;
+
+        if (rowCount === 1) {
+            alert("At least one invoice line is required.");
+            return;
+        }
+
         btn.closest("tr").remove();
     }
 
