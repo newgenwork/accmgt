@@ -221,9 +221,9 @@ public class MainController {
 
         model.addAttribute("invoiceMaster", t.get());
 
-        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
+        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
         model.addAttribute("clients", clients.get());
-        Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
+        Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
 
 
@@ -241,9 +241,9 @@ public class MainController {
         invoiceMaster.setStatus("DRAFT");
         model.addAttribute("invoiceMaster", invoiceMaster);
 
-        Optional<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
+        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
         model.addAttribute("clients", clients.get());
-        Optional<Ledger> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
+        Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
 
 
@@ -340,6 +340,9 @@ public class MainController {
 
         if (action.equals("submit")) {
             Event toApply = getConfigEvent(invoiceMasterEdit.getClient(), "invoice");
+            if (toApply == null){
+                throw new RuntimeException("No Event Found. Please configure the ledger config event for invoice Event / " + invoiceMasterEdit.getClient().getLedgerName());
+            }
             if (toApply != null) {
                 Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
                 while (itAction.hasNext()) {
@@ -367,6 +370,9 @@ public class MainController {
 
         if (action.equals("receivePayment")) {
             Event toApply = getConfigEvent(invoiceMasterEdit.getClient(), "invoicePayment");
+            if (toApply == null){
+                throw new RuntimeException("No Event Found. Please configure the ledger config event for invoice Payment Event /" + invoiceMasterEdit.getClient().getLedgerName());
+            }
             if (toApply != null) {
                 Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
                 while (itAction.hasNext()) {
@@ -402,6 +408,9 @@ public class MainController {
 
                     InvoiceDetail invd = iterator.next();
                     Event toApplyLocal = getConfigEvent(invd.getEmployee(), "invoicePayment");
+                    if (toApply == null){
+                        throw new RuntimeException("No Event Found. Please configure the ledger config event for invoice Payment Event /" + invd.getEmployee().getLedgerName());
+                    }
                     Iterator<EventAction> itAction = toApplyLocal.getEventConfig().getEventAction().iterator();
                     while (itAction.hasNext()) {
                         if (toApplyLocal != null) {
@@ -497,7 +506,10 @@ public class MainController {
         Iterator<Event> it = config.getEvents().iterator();
 
         Event toApply = getConfigEvent(journalEntry.getTargetAccount(), journalEntry.getType());
-
+        if (toApply == null){
+            throw new RuntimeException("No Event Found. Please configure the ledger config event for  Event /"
+                    + journalEntry.getTargetAccount().getLedgerName() + " / " + journalEntry.getType());
+        }
         if (toApply != null) {
             Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
             while (itAction.hasNext()) {
