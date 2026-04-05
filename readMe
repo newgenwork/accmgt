@@ -15,7 +15,9 @@ CREATE TABLE "ACT"."USERS" (
 
 CREATE INDEX idx_user_email ON "ACT"."USERS"(email);
 
-
+#####registoration password
+asdfasdf@#23#%4354^dgsfgsdfgsfgsdfgsdfgsdfgsdfgsdfgsdfgsdfg354545454545
+#####
 
   <th>transactionDate</th>
             <th>type</th>

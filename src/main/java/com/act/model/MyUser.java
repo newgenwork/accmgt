@@ -15,6 +15,7 @@ public class MyUser {
     private String lastName;
     private String email;
     private String password;
+    private String enabled ;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roleact",
             joinColumns = @JoinColumn(
@@ -37,6 +38,7 @@ public class MyUser {
         this.email = email;
         this.password = password;
         this.roles = roles;
+        this.enabled = "false";
     }
 
     public Long getId() {
@@ -85,5 +87,13 @@ public class MyUser {
 
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
     }
 }

@@ -63,6 +63,10 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Invalid username or password");
         }
 
+        if (!user.getEnabled().equals("true")) {
+            throw new UsernameNotFoundException("Request Admin to enable user");
+        }
+
         return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
 
     }
