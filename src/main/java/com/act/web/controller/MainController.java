@@ -170,7 +170,7 @@ public class MainController {
 
         model.addAttribute("transactions", transactions);
         model.addAttribute("account", t.get().getLedgerName());
-        return "statement-list";
+        return "statement-List";
     }
 
     //employees
