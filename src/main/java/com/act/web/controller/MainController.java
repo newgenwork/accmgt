@@ -511,7 +511,8 @@ public class MainController {
     @GetMapping("/journal/add")
     public String showAddJournalForm(Model model) {
         JournalEntry je = new JournalEntry();
-        je.setId(UUID.randomUUID().toString());
+       // je.setId(UUID.randomUUID().toString());
+        je.setId("JN-" + sequenceRepository.getNextInvoiceSequence().toString());
         model.addAttribute("journal", je);
         Optional<List<Ledger>> clients = ledgerRepository.findByType("Expense");
         model.addAttribute("clients", clients.get());
