@@ -232,6 +232,8 @@
 
     <div class="mt-3">
 
+
+
         <!-- ================= DRAFT ================= -->
         <div th:if="*{status == 'DRAFT'}">
             <button type="submit"
@@ -247,6 +249,12 @@
                     class="btn btn-success">
                 Submit Invoice
             </button>
+
+            <a th:href="'/api/v1/invoice/' + ${invoiceMaster.reference} + '/pdf'"
+               target="_blank"
+               class="btn btn-secondary ml-2">
+                🖨 Print PDF
+            </a>
         </div>
 
         <!-- ================= SUBMITTED ================= -->
@@ -257,13 +265,29 @@
                     class="btn btn-warning">
                 Received Payment
             </button>
+            <a th:href="'/api/v1/invoice/' + ${invoiceMaster.reference} + '/pdf'"
+               target="_blank"
+               class="btn btn-secondary ml-2">
+                🖨 Print PDF
+            </a>
         </div>
+
+
+
+
+
+
 
         <!-- ================= PAID / RECEIVED ================= -->
         <div th:if="*{status == 'PAID'}">
         <span class="badge badge-success">
             Payment Received
         </span>
+            <a th:href="'/api/v1/invoice/' + ${invoiceMaster.reference} + '/pdf'"
+               target="_blank"
+               class="btn btn-secondary ml-2">
+                🖨 Print PDF
+            </a>
         </div>
 
     </div>

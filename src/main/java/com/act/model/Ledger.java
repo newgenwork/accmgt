@@ -46,6 +46,10 @@ public class Ledger {
     @Column(nullable = true)
     private String label;
 
+
+    private String companyName;
+    private String companyAddress;
+
     public Long getId() {
         return id;
     }
@@ -146,5 +150,19 @@ public class Ledger {
         this.label = label;
     }
 
+    public String getCompanyName() {
+        return companyName;
+    }
 
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
 }

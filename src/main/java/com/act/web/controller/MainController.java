@@ -11,6 +11,10 @@ import com.act.service.impl.UserServiceImpl;
 import com.act.web.dto.MyUserRegistrationDto;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,10 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 @Controller
 @RequestMapping("api/v1/")
@@ -34,6 +42,9 @@ public class MainController {
     private final JournalEntryRepository journalEntryRepository;
     private final TrasactionRepository trasactionRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private  SequenceRepository sequenceRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -44,6 +55,7 @@ public class MainController {
         this.journalEntryRepository = journalEntryRepository;
         this.trasactionRepository = trasactionRepository;
         this.userRepository = userRepository;
+        //this.sequenceRepository = sequenceRepository;
     }
 
 
@@ -195,6 +207,8 @@ public class MainController {
             t.get().setInvoiceRateValidateFromDate(ledger.getInvoiceRateValidateFromDate());
             t.get().setInvoiceRateValidateToDate(ledger.getInvoiceRateValidateToDate());
             t.get().setLabel(ledger.getLabel());
+            t.get().setCompanyName(ledger.getCompanyName());
+            t.get().setCompanyAddress(ledger.getCompanyAddress());
             ledgerRepository.save(t.get());
             return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 
@@ -244,7 +258,8 @@ public class MainController {
         InvoiceMaster invoiceMaster = new InvoiceMaster();
         invoiceMaster.setDetails(new ArrayList<>());
         invoiceMaster.getDetails().add(new InvoiceDetail());
-        invoiceMaster.setReference(UUID.randomUUID().toString());
+        //invoiceMaster.setReference(UUID.randomUUID().toString());
+        invoiceMaster.setReference("INV-" + sequenceRepository.getNextInvoiceSequence().toString());
         invoiceMaster.setStatus("DRAFT");
         model.addAttribute("invoiceMaster", invoiceMaster);
 
@@ -607,4 +622,171 @@ public class MainController {
         return "redirect:/api/v1/user/changeProfile?success=" +user.getEmail();
     }
 
+
+
+    @GetMapping("/invoice/{reference}/pdf")
+    public void generateInvoicePdf(
+            @PathVariable String reference,
+            HttpServletResponse response) throws Exception {
+
+        Optional<InvoiceMaster> invoice = invoiceMasterRepository.findByReference(reference);
+
+        response.setContentType("application/pdf");
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=invoice-" + invoice.get().getReference() + ".pdf"
+        );
+
+        generate(invoice.get(), response.getOutputStream());
+    }
+
+
+    public void generate(InvoiceMaster invoice, OutputStream os) throws Exception {
+
+        DateTimeFormatter dateFormatter =
+                DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        Document document = new Document();
+        PdfWriter.getInstance(document, os);
+        document.open();
+
+        /* ================= COMPANY HEADER ================= */
+
+        PdfPTable companyHeader = new PdfPTable(2);
+        companyHeader.setWidthPercentage(100);
+        companyHeader.setSpacingAfter(15);
+        companyHeader.setWidths(new float[]{3, 7});
+
+        // Logo - LEFT
+        Image logo = Image.getInstance("src/main/resources/static/megsonsoft-logo.png");
+        logo.scaleToFit(120, 60);
+
+        PdfPCell logoCell = new PdfPCell(logo);
+        logoCell.setBorder(Rectangle.NO_BORDER);
+        logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        companyHeader.addCell(logoCell);
+
+        // Company Address - RIGHT
+        Font companyNameFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font infoFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+
+        Paragraph companyInfo = new Paragraph();
+        companyInfo.setAlignment(Element.ALIGN_RIGHT);
+        companyInfo.add(new Chunk("Megson, Inc\n", companyNameFont));
+        companyInfo.add(new Chunk("39899 Balentine Drive Suite 200\n", infoFont));
+        companyInfo.add(new Chunk("Newark, CA 94560\n", infoFont));
+        companyInfo.add(new Chunk("Ph : 510-980-3037\n", infoFont));
+        companyInfo.add(new Chunk("https://www.megsonsoft.com/", infoFont));
+
+        PdfPCell companyCell = new PdfPCell(companyInfo);
+        companyCell.setBorder(Rectangle.NO_BORDER);
+        companyCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        companyHeader.addCell(companyCell);
+
+        document.add(companyHeader);
+
+        /* ================= TITLE ================= */
+
+        Paragraph title = new Paragraph(
+                "INVOICE",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+
+        /* ================= INVOICE HEADER DETAILS ================= */
+
+        PdfPTable headerTable = new PdfPTable(2);
+        headerTable.setWidthPercentage(50);
+        headerTable.setHorizontalAlignment(Element.ALIGN_LEFT); // ✅ table left
+        headerTable.setSpacingAfter(15);
+        headerTable.setWidths(new float[]{2, 5});
+
+        headerTable.addCell(leftNoBorderCell("Reference:"));
+        headerTable.addCell(leftNoBorderCell(invoice.getReference()));
+
+        headerTable.addCell(leftNoBorderCell("Date:"));
+        headerTable.addCell(leftNoBorderCell(
+                invoice.getInvoiceDate().format(dateFormatter)));
+
+        headerTable.addCell(leftNoBorderCell("Client:"));
+        headerTable.addCell(leftNoBorderCell(
+                invoice.getClient().getCompanyName()));
+
+        headerTable.addCell(leftNoBorderCell("Client Address:"));
+        headerTable.addCell(leftNoBorderCell(
+                invoice.getClient().getCompanyAddress()));
+
+        document.add(headerTable);
+
+        /* ================= INVOICE LINES ================= */
+
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10);
+
+        table.addCell("Quantity");
+        table.addCell("Description");
+        table.addCell("Serviced");
+        table.addCell("Rate");
+        table.addCell("Amount");
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (InvoiceDetail d : invoice.getDetails()) {
+
+            table.addCell(d.getNoOfHrs() + " hrs");
+            table.addCell("Professional Services for " +
+                    d.getEmployee().getLedgerName());
+            table.addCell(
+                    d.getStartDate().format(dateFormatter) +
+                            " - " +
+                            d.getEndDate().format(dateFormatter)
+            );
+            table.addCell(d.getRate().toString());
+            table.addCell(d.getAmount().toString());
+
+            if (d.getAmount() != null) {
+                totalAmount = totalAmount.add(d.getAmount());
+            }
+        }
+
+        /* ================= TOTAL ROW ================= */
+
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
+
+        PdfPCell totalLabelCell = new PdfPCell(new Phrase("Total", totalFont));
+        totalLabelCell.setColspan(4);
+        totalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalLabelCell.setPadding(8);
+
+        PdfPCell totalValueCell = new PdfPCell(
+                new Phrase(totalAmount.toString(), totalFont));
+        totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalValueCell.setPadding(8);
+
+        table.addCell(totalLabelCell);
+        table.addCell(totalValueCell);
+
+        document.add(table);
+
+        document.close();
+    }
+
+    /* ================= UTILITY ================= */
+
+    private PdfPCell leftNoBorderCell(String text) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        return cell;
+    }
+
+
+    private PdfPCell noBorderCell(String text) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setPadding(5);
+        return cell;
+    }
 }
