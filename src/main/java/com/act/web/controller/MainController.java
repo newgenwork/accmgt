@@ -144,6 +144,9 @@ public class MainController {
 
         Optional<Ledger> t = ledgerRepository.findById(id);
         model.addAttribute("ledger", t.get());
+
+        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
+        model.addAttribute("clients", clients.get());
         return "ledger-add";
     }
     @GetMapping("/ledger/statement/{id}")
@@ -190,6 +193,9 @@ public class MainController {
     @GetMapping("/ledger/add")
     public String showAddLedgerForm(Model model) {
         model.addAttribute("ledger", new Ledger());
+
+        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
+        model.addAttribute("clients", clients.get());
         return "ledger-add";
     }
 
@@ -209,6 +215,7 @@ public class MainController {
             t.get().setLabel(ledger.getLabel());
             t.get().setCompanyName(ledger.getCompanyName());
             t.get().setCompanyAddress(ledger.getCompanyAddress());
+            t.get().setInvoiceLedger(ledger.getInvoiceLedger());
             ledgerRepository.save(t.get());
             return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 

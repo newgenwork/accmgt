@@ -43,12 +43,19 @@ public class Ledger {
     private LocalDate invoiceRateValidateToDate;
 
 
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(
+            name = "invoice_ledger_id",
+            nullable = true
+    )
+    private Ledger invoiceLedger;
+
     @Column(nullable = true)
     private String label;
-
-
     private String companyName;
     private String companyAddress;
+
 
     public Long getId() {
         return id;
@@ -164,5 +171,13 @@ public class Ledger {
 
     public void setCompanyAddress(String companyAddress) {
         this.companyAddress = companyAddress;
+    }
+
+    public Ledger getInvoiceLedger() {
+        return invoiceLedger;
+    }
+
+    public void setInvoiceLedger(Ledger invoiceLedger) {
+        this.invoiceLedger = invoiceLedger;
     }
 }
