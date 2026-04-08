@@ -725,11 +725,18 @@ public class MainController {
 
         Paragraph companyInfo = new Paragraph();
         companyInfo.setAlignment(Element.ALIGN_RIGHT);
-        companyInfo.add(new Chunk("Megson, Inc\n", companyNameFont));
-        companyInfo.add(new Chunk("39899 Balentine Drive Suite 200\n", infoFont));
-        companyInfo.add(new Chunk("Newark, CA 94560\n", infoFont));
-        companyInfo.add(new Chunk("Ph : 510-980-3037\n", infoFont));
-        companyInfo.add(new Chunk("https://www.megsonsoft.com/", infoFont));
+        Optional<Ledger> loca = ledgerRepository.findByLedgerName("Revenue");
+        if (loca.isPresent()) {
+
+            companyInfo.add(new Chunk( loca.get().getCompanyName() + "\n", infoFont));
+
+            String[] parts = loca.get().getCompanyAddress().split("\\|");
+            for (String part : parts) {
+                companyInfo.add(new Chunk(part + "\n", infoFont));
+            }
+
+        }
+
 
         PdfPCell companyCell = new PdfPCell(companyInfo);
         companyCell.setBorder(Rectangle.NO_BORDER);
