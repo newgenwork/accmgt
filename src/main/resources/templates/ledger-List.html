@@ -45,6 +45,7 @@
                     <th>Invoice Rate</th>
                     <th>Valid From</th>
                     <th>Valid To</th>
+                    <th>action</th>
                 </tr>
                 </thead>
 
@@ -77,6 +78,18 @@
                     <td th:text="${ledger.invoiceRate}"></td>
                     <td th:text="${ledger.invoiceRateValidateFromDate}"></td>
                     <td th:text="${ledger.invoiceRateValidateToDate}"></td>
+
+                    <td>
+
+                        <div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
+                            <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>
+                            <h5>Create Invoice</h5>
+                            </a>
+                        </div>
+
+
+                        </a>
+                    </td>
                 </tr>
                 </tbody>
             </table>

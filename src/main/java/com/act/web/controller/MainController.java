@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.List;
 
@@ -272,6 +273,50 @@ public class MainController {
 
         Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
         model.addAttribute("clients", clients.get());
+        Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
+        model.addAttribute("employees", employees.get());
+
+
+        return "invoiceMaster-add";
+    }
+//http://localhost:8080/api/v1/invoicesMaster/add/4
+    @GetMapping("/invoicesMaster/add/{ar}")
+    String showAddInvoiceFormWithledgerAR(
+            @PathVariable("ar") Long ar,
+            Model model) {
+
+        Ledger ledgerAR = ledgerRepository.findById(ar).get();
+
+        Optional<List<Ledger>> finAllEmployeesforAR = ledgerRepository.findByIsEmployeeAndTypeAndInvoiceLedger(
+                "Y", "Expense", ledgerAR);
+
+        InvoiceMaster invoiceMaster = new InvoiceMaster();
+        invoiceMaster.setDetails(new ArrayList<>());
+
+        Iterator<Ledger> it = finAllEmployeesforAR.get().iterator();
+        while (it.hasNext()) {
+            Ledger local = it.next();
+            InvoiceDetail invd = new InvoiceDetail();
+            invd.setId(local.getId());
+            invd.setRate(local.getInvoiceRate());
+            invd.setEmployee(local);
+
+            invd.setStartDate(LocalDate.now()
+                    .with(TemporalAdjusters.firstDayOfMonth()));
+            invd.setEndDate(LocalDate.now()
+                    .with(TemporalAdjusters.lastDayOfMonth()));
+
+
+            invoiceMaster.getDetails().add(invd);
+        }
+        invoiceMaster.setReference("INV-" + sequenceRepository.getNextInvoiceSequence().toString());
+        invoiceMaster.setStatus("DRAFT");
+        model.addAttribute("invoiceMaster", invoiceMaster);
+
+        List<Ledger> clients = new ArrayList<>();
+        clients.add(ledgerAR);
+
+        model.addAttribute("clients", clients);
         Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
 
