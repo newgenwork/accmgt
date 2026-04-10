@@ -38,6 +38,10 @@
                     <th>Reference</th>
                     <th>Date</th>
                     <th>Status</th>
+                    <th>Amount</th>
+                    <th>clientName</th>
+                    <th>notes</th>
+
                 </tr>
                 </thead>
 
@@ -55,6 +59,9 @@
 
                     <td th:text="${inv.invoiceDate}"></td>
                     <td th:text="${inv.status}"></td>
+                    <td th:text="${inv.amount}"></td>
+                    <td th:text="${inv.client?.ledgerName}"></td>
+                    <td th:text="${inv.notes}"></td>
                 </tr>
                 </tbody>
             </table>

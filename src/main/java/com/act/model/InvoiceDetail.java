@@ -40,6 +40,9 @@ public class InvoiceDetail {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
+    @Column(nullable = true)
+    private String notes;
+
     public Long getId() {
         return id;
     }
@@ -102,6 +105,14 @@ public class InvoiceDetail {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     // Getters & Setters

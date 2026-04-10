@@ -40,7 +40,8 @@ public class InvoiceMaster {
     @OneToMany(mappedBy = "invoiceMaster", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<InvoiceDetail> details;
 
-
+    @Column(nullable = true)
+    private String notes;
 
     public InvoiceMaster() {}
 
@@ -90,5 +91,13 @@ public class InvoiceMaster {
 
     public void setReceivedDate(LocalDate receivedDate) {
         this.receivedDate = receivedDate;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

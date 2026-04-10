@@ -1,5 +1,6 @@
 package com.act.web.controller;
 
+import com.act.dto.InvoiceMasterDto;
 import com.act.dto.TransactionDto;
 import com.act.json.model.Config;
 import com.act.json.model.Event;
@@ -563,7 +564,48 @@ public class MainController {
 
         List<InvoiceMaster> dd = invoiceMasterRepository.findAll();
         dd.sort(Comparator.comparing(InvoiceMaster::getInvoiceDate).reversed());
-        model.addAttribute("invoiceMasterList", dd);
+
+        List<InvoiceMasterDto> retList = new ArrayList<InvoiceMasterDto>();
+
+        Iterator<InvoiceMaster> it = dd.iterator();
+
+        while (it.hasNext()) {
+            InvoiceMaster item = it.next();
+            InvoiceMasterDto dto = new InvoiceMasterDto();
+            dto.setId(item.getId());
+            dto.setNotes(item.getNotes());
+            dto.setInvoiceDate(item.getInvoiceDate());
+            dto.setReceivedDate(item.getReceivedDate());
+            dto.setReference(item.getReference());
+            dto.setStatus(item.getStatus());
+            dto.setClient(item.getClient());
+
+            BigDecimal totalAmount =
+                    item.getDetails().stream()
+                            .map(InvoiceDetail::getAmount)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            dto.setAmount(totalAmount);
+            Iterator<InvoiceDetail> ita = item.getDetails().iterator();
+            while (ita.hasNext()) {
+                InvoiceDetail localDet = ita.next();
+                if (dto.getNotes() == null) {
+                    dto.setNotes( localDet.getEmployee().getLedgerName() + "| hrs:" +
+                            localDet.getNoOfHrs() +"|St Dt:" +
+                            localDet.getStartDate() + "|End Dt:" +
+                            localDet.getEndDate() + "|Amt:" +
+                                    localDet.getAmount() + "|rate:" +
+                            localDet.getRate()  );
+                } else {
+                    dto.setNotes(dto.getNotes() + "| " + localDet.getEmployee().getLedgerName());
+                }
+            }
+            retList.add(dto);
+        }
+
+
+        model.addAttribute("invoiceMasterList", retList);
         return "invoicesMaster-List";
     }
 
