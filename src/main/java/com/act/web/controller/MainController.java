@@ -397,17 +397,43 @@ public class MainController {
             }
             if (action.equals("submit")) {
                 invoiceMaster.setStatus("SUBMITTED");
+            }
 
+
+            invoiceMasterEdit  = new InvoiceMaster();
+            invoiceMasterEdit.setClient(invoiceMaster.getClient());
+            invoiceMasterEdit.setReference(invoiceMaster.getReference());
+            invoiceMasterEdit.setInvoiceDate(invoiceMaster.getInvoiceDate());
+            invoiceMasterEdit.setStatus(invoiceMaster.getStatus());
+            invoiceMasterEdit.setReceivedDate(invoiceMaster.getReceivedDate());
+            //invoiceMasterEdit.setId(invoiceMaster.getId());
+
+            long line = 0;
+            for (int i = 0 ; i < invoiceMaster.getDetails().size(); i++) {
+                if (invoiceMaster.getDetails().get(i).getEmployee() != null) {
+                    if (invoiceMasterEdit.getDetails() ==null) {
+                        invoiceMasterEdit.setDetails(new ArrayList<InvoiceDetail>());
+                    }
+                    InvoiceDetail invd = new InvoiceDetail() ;
+                    invoiceMasterEdit.getDetails().add(invd);
+                    //line = line + 1;
+                    //invd.setId(line);
+                    invd.setAmount(invoiceMaster.getDetails().get(i).getAmount());
+                    invd.setEmployee(invoiceMaster.getDetails().get(i).getEmployee());
+                    invd.setRate(invoiceMaster.getDetails().get(i).getRate());
+                    invd.setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
+                    invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
+                    invd.setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
+                    invd.setInvoiceMaster(invoiceMasterEdit);
+                }
 
             }
 
 
-            for (InvoiceDetail invd : invoiceMaster.getDetails()) {
-                invd.setInvoiceMaster(invoiceMaster);
-            }
 
-            invoiceMasterRepository.save(invoiceMaster);
-            invoiceMasterEdit = invoiceMaster;
+
+            //invoiceMasterEdit = invoiceMaster;
+            invoiceMasterRepository.save(invoiceMasterEdit);
 
         }
 

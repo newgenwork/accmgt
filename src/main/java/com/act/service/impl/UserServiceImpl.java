@@ -78,4 +78,9 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
     }
+
+
+    public static void main(String args[]){
+
+    }
 }
