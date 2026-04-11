@@ -56,6 +56,9 @@ public class Ledger {
     private String companyName;
     private String companyAddress;
 
+    @Column(nullable = true)
+    private String invoiceCreationType ; //batch or consolidated
+
 
     public Long getId() {
         return id;
@@ -179,5 +182,13 @@ public class Ledger {
 
     public void setInvoiceLedger(Ledger invoiceLedger) {
         this.invoiceLedger = invoiceLedger;
+    }
+
+    public String getInvoiceCreationType() {
+        return invoiceCreationType;
+    }
+
+    public void setInvoiceCreationType(String invoiceCreationType) {
+        this.invoiceCreationType = invoiceCreationType;
     }
 }

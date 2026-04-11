@@ -110,6 +110,17 @@
                 </div>
 
 
+                <div class="form-group">
+                    <label class="control-label" for="type">
+                        Invoice Creation Type
+                    </label>
+                    <select id="type" class="form-control" th:field="*{ledger.invoiceCreationType}"  required autofocus="autofocus">
+                        <option value="Batch">Consolidated</option>
+                        <option value="Single">Single</option>
+                    </select>
+                </div>
+
+
                 <!-- Client -->
                 <div class="form-group">
                     <label for="invoiceLedger">Invoice Ledger</label>
@@ -153,6 +164,9 @@
                     </label>
                     <input id="companyAddress" class="form-control" th:field="*{ledger.companyAddress}"  autofocus="autofocus">
                 </div>
+
+
+
 
 
                 <div class="form-group">
