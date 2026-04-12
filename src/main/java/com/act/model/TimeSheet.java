@@ -31,7 +31,7 @@ public class TimeSheet {
 
     @ManyToOne
     @JoinColumn(name = "invoiceDetail", nullable = true)
-    private InvoiceDetail invoiceMaster;
+    private InvoiceDetail invoiceDetail;
 
     public Long getId() {
         return id;
@@ -73,11 +73,11 @@ public class TimeSheet {
         this.noOfHrs = noOfHrs;
     }
 
-    public InvoiceDetail getInvoiceMaster() {
-        return invoiceMaster;
+    public InvoiceDetail getInvoiceDetail() {
+        return invoiceDetail;
     }
 
-    public void setInvoiceMaster(InvoiceDetail invoiceMaster) {
-        this.invoiceMaster = invoiceMaster;
+    public void setInvoiceDetail(InvoiceDetail invoiceDetail) {
+        this.invoiceDetail = invoiceDetail;
     }
 }

@@ -25,17 +25,24 @@
       <!--Successful Registration-->
       <div th:if="${param.success}">
         <div class="alert alert-info">
-          You have successfully registered!
+          Operation completed successfully!
+          <span th:text="${param.success}"></span>
         </div>
       </div>
 
-      <form th:action="@{/api/v1/timesheet/add}" method="post" th:object="${timesheet}">
 
-        <input type="hidden" th:field="*{id}" />
+      <div th:if="${param.error}">
+        <div class="alert alert-danger">
+          <span th:text="${param.error}"></span>
+        </div>
+      </div>
+
+      <form th:action="@{/api/v1/invoicesMaster/filter}" th:object="${invoiceFilter}" method="post"  >
+
         <div class="form-group">
-          <label for="invoiceLedger">Contractor</label>
-          <select id="invoiceLedger"
-                  th:field="*{employee}"
+          <label for="invoiceMaster">Contractor</label>
+          <select id="invoiceMaster"
+                  th:field="*{clientId}"
                   class="form-control"
           >
             <option value="" >
@@ -43,7 +50,7 @@
             </option>
 
 
-            <option th:each="c : ${employees}"
+            <option th:each="c : ${clients}"
                     th:value="${c.id}"
                     th:text="${c.ledgerName}">
             </option>
@@ -54,7 +61,8 @@
           <label class="control-label" for="startDate">
             Start Date
           </label>
-          <input id="startDate" type="date" class="form-control" th:field="*{startDate}"  autofocus="autofocus" required>
+          <input id="startDate" type="date" class="form-control" th:field="*{startDate}"
+                 autofocus="autofocus" required >
         </div>
         <div class="form-group">
           <label class="control-label" for="endDate">
@@ -65,16 +73,6 @@
 
 
 
-        <div class="form-group">
-          <label class="control-label" for="noOfHrs">
-            Hrs
-          </label>
-          <input id="noOfHrs" type="number"
-                 step="0.01"
-                 min="0"
-                 placeholder="0.00"  class="form-control" th:field="*{noOfHrs}"
-                 autofocus="autofocus"/>
-        </div>
 
 
         <div class="form-group">

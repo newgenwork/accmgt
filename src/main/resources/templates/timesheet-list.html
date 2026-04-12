@@ -31,6 +31,14 @@
         </div>
     </div>
 
+
+    <div th:if="${param.error}">
+        <div class="alert alert-danger">
+            <span th:text="${param.error}"></span>
+        </div>
+    </div>
+
+
     <h1>View Time Sheets</h1>
 
     <table class="table table-bordered table-striped table-hover">
@@ -48,11 +56,13 @@
         <tbody>
         <tr th:each="ts : ${timeSheetList}">
 
-            <!-- ✅ Edit link like journal -->
-            <td>
-                <a th:href="@{/api/v1/timesheet/edit.employee?.ledgerName}">
 
+            <td>
+                <a th:href="@{/api/v1/timesheet/edit/{id}(id=${ts.getId()})}"/>
+                  <span th:text="${ts.getId()}"></span>
+                </a>
             </td>
+            <td th:text="${ts.employee.ledgerName}"></td>
 
             <td th:text="${ts.startDate}"></td>
             <td th:text="${ts.endDate}"></td>
