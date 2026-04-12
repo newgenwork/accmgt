@@ -57,7 +57,15 @@
                     <!-- Client -->
                     <div class="form-group col-md-4">
                         <label for="client">Client</label>
-                        <select id="client"
+                        <input type="hidden"
+                               id="client"
+                               th:field="*{client}"
+                               class="form-control"
+                               required />
+
+
+
+                        <select id="clientSelect"
                                 th:field="*{client}"
                                 class="form-control"
                                 required disabled>
@@ -138,6 +146,11 @@
                         <tr th:each="detail, iter : *{details}">
                             <!-- Employee -->
                             <td>
+                                <input type="hidden"
+                                       id="clienta"
+                                       th:field="*{details[__${iter.index}__].employee}"
+                                       class="form-control"
+                                       required />
                                 <select th:field="*{details[__${iter.index}__].employee}"
                                         class="form-control"
                                         onchange="onEmployeeChange(this)"
@@ -230,7 +243,14 @@
 
     <div class="mt-3">
 
-
+        <div th:if="*{status == 'INIT'}">
+            <button type="submit"
+                    name="action"
+                    value="save"
+                    class="btn btn-primary">
+                Save Invoice
+            </button>
+        </div>
 
         <!-- ================= DRAFT ================= -->
         <div th:if="*{status == 'DRAFT'}">

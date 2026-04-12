@@ -50,6 +50,10 @@
             <th>Start Date</th>
             <th>End Date</th>
             <th>Hours</th>
+            <th>InvoiceMaster</th>
+            <th>InvoiceDetails</th>
+
+
         </tr>
         </thead>
 
@@ -68,7 +72,9 @@
             <td th:text="${ts.endDate}"></td>
 
             <td th:text="${ts.noOfHrs}"></td>
+            <td th:text="${ts.invoiceDetail?.invoiceMaster?.reference }"></td>
 
+            <td th:text="${ts.invoiceDetail?.getId() }"></td>
         </tr>
         </tbody>
 

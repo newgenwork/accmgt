@@ -262,7 +262,7 @@ public class MainController {
         model.addAttribute("employees", employees.get());
 
 
-        return "invoiceMaster-add";
+        return "invoiceMaster-add-withFilter";
     }
 
     //InvoiceMaster
@@ -326,7 +326,8 @@ public class MainController {
             invoiceMaster.getDetails().add(invd);
         }
         invoiceMaster.setReference("INV-" + sequenceRepository.getNextInvoiceSequence().toString());
-        invoiceMaster.setStatus("DRAFT");
+        invoiceMaster.setStatus("INIT");
+        invoiceMaster.setClient(ledgerAR);
         model.addAttribute("invoiceMaster", invoiceMaster);
 
         List<Ledger> clients = new ArrayList<>();
@@ -442,6 +443,17 @@ public class MainController {
                         invoiceMasterEdit.getDetails().get(i).setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
                         invoiceMasterEdit.getDetails().get(i).setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
                         invoiceMasterEdit.getDetails().get(i).setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
+
+                        List<TimeSheet> tsList = timesheetRepository.findCollidingTimeSheets(invoiceMaster.getDetails().get(i).getEmployee(),
+                                invoiceMaster.getDetails().get(i).getStartDate(),
+                                invoiceMaster.getDetails().get(i).getEndDate(), null);
+
+                        for (TimeSheet timeSheet : tsList) {
+                            timeSheet.setInvoiceDetail(invoiceMasterEdit.getDetails().get(i));
+                            timesheetRepository.save(timeSheet);
+                        }
+
+
                     } else {
                         break;
                     }
@@ -491,6 +503,9 @@ public class MainController {
                         invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
                         invd.setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
                         invd.setInvoiceMaster(invoiceMasterLocal);
+                        if (invoiceMasterLocal.getStatus().equalsIgnoreCase("INIT")) {
+                            invoiceMasterLocal.setStatus("DRAFT");
+                        }
                         invoiceMasterRepository.save(invoiceMasterLocal);
                     }
                     //invoiceMasterRepository.save(invoiceMasterLocal);
@@ -1075,6 +1090,9 @@ public class MainController {
             t = timesheetRepository.findById(timeSheet.getId());
         }
         if (timeSheet.getId() != null && t!=null && t.isPresent()) {
+            if (t.get().getInvoiceDetail() !=null) {
+                return "redirect:/api/v1/timesheet/list?error=hrs are already invoiced";
+            }
             t.get().setEmployee(timeSheet.getEmployee());
             t.get().setEndDate(timeSheet.getEndDate());
             t.get().setStartDate(timeSheet.getStartDate());

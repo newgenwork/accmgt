@@ -14,6 +14,7 @@ import java.util.List;
 
 public interface TimesheetRepository extends JpaRepository<TimeSheet, Long> {
 
+
     @Query(
             "SELECT t FROM TimeSheet t " +
                     "WHERE t.employee = :employee " +
