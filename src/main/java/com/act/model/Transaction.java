@@ -28,6 +28,10 @@ public class Transaction {
     @JoinColumn(name = "invoiceMaster", nullable = true)
     private InvoiceMaster invoiceMaster;
 
+    @ManyToOne
+    @JoinColumn(name = "invoiceDetail", nullable = true)
+    private InvoiceDetail invoiceDetail;
+
     @Column(nullable = true)
     private String description;
 
@@ -93,5 +97,13 @@ public class Transaction {
 
     public void setInvoiceMaster(InvoiceMaster invoiceMaster) {
         this.invoiceMaster = invoiceMaster;
+    }
+
+    public InvoiceDetail getInvoiceDetail() {
+        return invoiceDetail;
+    }
+
+    public void setInvoiceDetail(InvoiceDetail invoiceDetail) {
+        this.invoiceDetail = invoiceDetail;
     }
 }

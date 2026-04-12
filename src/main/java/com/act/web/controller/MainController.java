@@ -78,6 +78,7 @@ public class MainController {
 
     void updateBalanceandTransaction(BigDecimal totalAmount,
                                      InvoiceMaster invoiceMaster,
+                                     InvoiceDetail invoiceDetail,
                                      JournalEntry journalEntry,
                                      String from,
                                      String to,
@@ -107,6 +108,7 @@ public class MainController {
         transaction.setTransactionDate(transactionDate);
         transaction.setInvoiceMaster(invoiceMaster);
         transaction.setJournalEntry(journalEntry);
+        transaction.setInvoiceDetail(invoiceDetail);
         trasactionRepository.save(transaction);
 
         Transaction transactionNew = new Transaction();
@@ -116,6 +118,7 @@ public class MainController {
         transactionNew.setTransactionDate(transactionDate);
         transactionNew.setInvoiceMaster(invoiceMaster);
         transactionNew.setJournalEntry(journalEntry);
+        transaction.setInvoiceDetail(invoiceDetail);
         trasactionRepository.save(transactionNew);
     }
 
@@ -569,6 +572,7 @@ public class MainController {
                             totalAmount,
                             invoiceMasterEdit,
                             null,
+                            null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
                             "invoice (Submit Event) : ref : " + invoiceMasterEdit.getReference() ,
@@ -597,6 +601,7 @@ public class MainController {
 
                     updateBalanceandTransaction(totalAmount,
                             invoiceMasterEdit,
+                            null,
                             null,
                             ea.getFromLedgerName(),
                             ea.getToLedgerName(),
@@ -636,6 +641,7 @@ public class MainController {
                                 // amt is NOT zero
                                 updateBalanceandTransaction(amt,
                                         invoiceMasterEdit,
+                                        invd,
                                         null,
                                         ea.getFromLedgerName(),
                                         ea.getToLedgerName(),
@@ -799,7 +805,7 @@ public class MainController {
                 journalEntryRepository.save(je);
 
 
-                updateBalanceandTransaction(je.getAmount(), null,
+                updateBalanceandTransaction(je.getAmount(), null, null,
                         je,
                         ea.getFromLedgerName(),
                         ea.getToLedgerName(),
