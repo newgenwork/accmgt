@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>View Time Sheets</title>
+
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div th:replace="fragments/header :: header"></div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- ✅ Success Message -->
+    <div th:if="${param.success}">
+        <div class="alert alert-info">
+            Operation completed successfully!
+            <span th:text="${param.success}"></span>
+        </div>
+    </div>
+
+    <h1>View Time Sheets</h1>
+
+    <table class="table table-bordered table-striped table-hover">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Employee</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Hours</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="ts : ${timeSheetList}">
+
+            <!-- ✅ Edit link like journal -->
+            <td>
+                <a th:href="@{/api/v1/timesheet/edit.employee?.ledgerName}">
+
+            </td>
+
+            <td th:text="${ts.startDate}"></td>
+            <td th:text="${ts.endDate}"></td>
+
+            <td th:text="${ts.noOfHrs}"></td>
+
+        </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>
+``

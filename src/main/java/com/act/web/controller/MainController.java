@@ -44,6 +44,7 @@ public class MainController {
     private final JournalEntryRepository journalEntryRepository;
     private final TrasactionRepository trasactionRepository;
     private final UserRepository userRepository;
+    private final TimesheetRepository timesheetRepository;
 
     @Autowired
     private  SequenceRepository sequenceRepository;
@@ -51,13 +52,14 @@ public class MainController {
     private BCryptPasswordEncoder passwordEncoder;
 
     public MainController(LedgerRepository ledgerRepository, InvoiceMasterRepository invoiceMasterRepository,
-                          JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository, UserRepository userRepository) {
+                          JournalEntryRepository journalEntryRepository, TrasactionRepository trasactionRepository, UserRepository userRepository, TimesheetRepository timesheetRepository) {
         this.ledgerRepository = ledgerRepository;
         this.invoiceMasterRepository = invoiceMasterRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.trasactionRepository = trasactionRepository;
         this.userRepository = userRepository;
         //this.sequenceRepository = sequenceRepository;
+        this.timesheetRepository = timesheetRepository;
     }
 
 
@@ -954,4 +956,25 @@ public class MainController {
         cell.setPadding(5);
         return cell;
     }
+
+
+    @GetMapping("/timesheet/add")
+    public String showEditTimesheetForm(Model model) {
+
+        //ledgers ids for all employees
+        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("Y", "Expense", "employee");
+        model.addAttribute("employees", clients.get());
+
+        /*Optional<TimeSheet> optTmesheet = timesheetRepository.findById(timesheetId);
+        if (optTmesheet.isPresent()) {
+            model.addAttribute("timesheet", optTmesheet.get());
+        } else {
+            model.addAttribute("timesheet",new TimeSheet());
+        }*/
+
+        model.addAttribute("timesheet",new TimeSheet());
+
+        return "timesheet-add";
+    }
+
 }

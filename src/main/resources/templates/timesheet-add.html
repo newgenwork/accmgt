@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <div th:replace="fragments/header :: header"></div>
+  </div>
+</nav>
+
+
+
+
+<div class="container">
+  <div class="row  justify-content-center">
+    <div class="col-md-6 col-md-offset-3">
+
+      <h1>Add Timesheet</h1>
+
+      <!--Successful Registration-->
+      <div th:if="${param.success}">
+        <div class="alert alert-info">
+          You have successfully registered!
+        </div>
+      </div>
+
+      <form th:action="@{/api/v1/timesheet/add}" method="post" >
+
+
+        <div class="form-group">
+          <label for="invoiceLedger">Contractor</label>
+          <select id="invoiceLedger"
+                  th:field="*{timesheet.employee}"
+                  class="form-control"
+          >
+            <option value="" >
+              -- Select Client --
+            </option>
+
+
+            <option th:each="c : ${employees}"
+                    th:value="${c.id}"
+                    th:text="${c.ledgerName}">
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label" for="startDate">
+            Start Date
+          </label>
+          <input id="startDate" type="date" class="form-control" th:field="*{timesheet.startDate}"  autofocus="autofocus" required>
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="endDate">
+            End Date
+          </label>
+          <input id="endDate" type="date" class="form-control" th:field="*{timesheet.endDate}"  autofocus="autofocus" required>
+        </div>
+
+
+
+        <div class="form-group">
+          <label class="control-label" for="noOfHrs">
+            Hrs
+          </label>
+          <input id="noOfHrs" type="number"
+                 step="0.01"
+                 min="0"
+                 placeholder="0.00"  class="form-control" th:field="*{timesheet.noOfHrs}"
+                 autofocus="autofocus"/>
+        </div>
+
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>

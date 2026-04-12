@@ -66,8 +66,12 @@ public class UserServiceImpl implements UserService {
         if (!user.getEnabled().equals("true")) {
             throw new UsernameNotFoundException("Request Admin to enable user");
         }
-
-        return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+         try {
+             return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+         }catch (Exception e){
+             e.printStackTrace();
+             return null;
+         }
 
     }
 

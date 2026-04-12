@@ -88,10 +88,15 @@
 
                         <div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
                             <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>
-                            <h5>Create Invoice</h5>
+                            Create Invoice
                             </a>
                         </div>
 
+                        <!--div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
+                            <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>
+                           Add Timesheet
+                            </a>
+                        </div-->
 
                         </a>
                     </td>
