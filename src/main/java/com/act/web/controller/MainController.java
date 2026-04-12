@@ -649,7 +649,7 @@ public class MainController {
                                                 + invd.getEmployee().getLedgerName()
                                                 + " : Hrs :"
                                                 + invd.getNoOfHrs()
-                                                + " : rate :"
+                                                + " : rate to southbound :"
                                                 + ea.getAmountRatePerHour()
                                                 + " : StartDate : "
                                                 + invd.getStartDate()
