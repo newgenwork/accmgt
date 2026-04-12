@@ -649,6 +649,8 @@ public class MainController {
                                                 + invd.getEmployee().getLedgerName()
                                                 + " : Hrs :"
                                                 + invd.getNoOfHrs()
+                                                + " : rate :"
+                                                + ea.getAmountRatePerHour()
                                                 + " : StartDate : "
                                                 + invd.getStartDate()
                                                 + " : End date : "
