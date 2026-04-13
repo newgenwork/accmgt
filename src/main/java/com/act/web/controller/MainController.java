@@ -2,6 +2,7 @@ package com.act.web.controller;
 
 import com.act.dto.InvoiceFilter;
 import com.act.dto.InvoiceMasterDto;
+import com.act.dto.LedgerDto;
 import com.act.dto.TransactionDto;
 import com.act.json.model.Config;
 import com.act.json.model.Event;
@@ -129,19 +130,21 @@ public class MainController {
                 .create();
 
         Config config = gson.fromJson(ledger.getConfig(), Config.class);
-
-        Iterator<Event> it = config.getEvents().iterator();
-
         Event toApply = null;
-        while (it.hasNext()) {
-            Event event = it.next();
-            if (event.getName().equals(type)) {
-                LocalDate today = LocalDate.now();   // Current date
-                boolean isBetween = (!today.isBefore(event.getEventConfig().getValidFrom()))
-                        && (!today.isAfter(event.getEventConfig().getValidTo()));
-                if (isBetween) {
-                    toApply = event;
-                    break;
+        if (config.getEvents()!=null) {
+            Iterator<Event> it = config.getEvents().iterator();
+
+
+            while (it.hasNext()) {
+                Event event = it.next();
+                if (event.getName().equals(type)) {
+                    LocalDate today = LocalDate.now();   // Current date
+                    boolean isBetween = (!today.isBefore(event.getEventConfig().getValidFrom()))
+                            && (!today.isAfter(event.getEventConfig().getValidTo()));
+                    if (isBetween) {
+                        toApply = event;
+                        break;
+                    }
                 }
             }
         }
@@ -245,7 +248,53 @@ public class MainController {
 
     @GetMapping("/ledger/list")
     public String listLedgers(Model model) {
-        model.addAttribute("ledgers", ledgerRepository.findAll());
+
+        List<Ledger> retList = ledgerRepository.findAll();
+        List<LedgerDto> retListDto = new ArrayList<LedgerDto>();
+                Iterator<Ledger> it = retList.iterator();
+
+        while (it.hasNext()) {
+            Ledger led = it.next();
+            LedgerDto dto = new LedgerDto();
+            dto.setId(led.getId());
+            dto.setBalance(led.getBalance());
+            dto.setBalanceUpdateDate(led.getBalanceUpdateDate());
+            dto.setConfig(led.getConfig());
+            Event invoicePaymentEvent = getConfigEvent(led, "invoicePayment");
+            dto.setShareConfig("");
+            if (invoicePaymentEvent!=null) {
+                List<EventAction> listEventActions = invoicePaymentEvent.getEventConfig().getEventAction();
+                Iterator<EventAction> itlistEventActions = listEventActions.iterator();
+
+                while (itlistEventActions.hasNext()) {
+                    EventAction eventAction = itlistEventActions.next();
+                    if (eventAction!=null) {
+                        dto.setShareConfig(dto.getShareConfig() + "|"
+                                + eventAction.getFromLedgerName() + "=>"
+                                + eventAction.getToLedgerName() + ":"
+                                + eventAction.getType() + ":"
+                                + eventAction.getAmountRatePerHour() + "|");
+                    }
+                }
+            }
+
+            dto.setLedgerName(led.getLedgerName());
+            dto.setIsEmployee(led.getIsEmployee());
+            dto.setEnable(led.getEnable());
+
+            dto.setLabel(led.getLabel());
+            dto.setCompanyName(led.getCompanyName());
+            dto.setCompanyAddress(led.getCompanyAddress());
+            dto.setInvoiceRate(led.getInvoiceRate());
+            dto.setInvoiceRateValidateFromDate(led.getInvoiceRateValidateFromDate());
+            dto.setInvoiceRateValidateToDate(led.getInvoiceRateValidateToDate());
+            dto.setInvoiceLedger(led.getInvoiceLedger());
+            dto.setInvoiceCreationType(led.getInvoiceCreationType());
+            dto.setType(led.getType());
+            retListDto.add(dto);
+        }
+
+        model.addAttribute("ledgers", retListDto);
         return "ledger-List";
     }
 

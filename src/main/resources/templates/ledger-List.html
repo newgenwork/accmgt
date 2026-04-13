@@ -37,8 +37,8 @@
                     <th>Statement</th>
                     <th>Ledger Name</th>
                     <th>isEmployee</th>
-                    <th>Balance</th>
-                    <th>Balance Update Time</th>
+                    <th>Invoice Payment Share</th>
+
                     <th>Enable</th>
                     <th>Type</th>
                     <th>Label</th>
@@ -71,8 +71,10 @@
 
             <td th:text="${ledger.ledgerName}"></td>
                     <td th:text="${ledger.isEmployee}"></td>
-                    <td th:text="${ledger.balance}"></td>
-                    <td th:text="${ledger.balanceUpdateDate}"></td>
+                    <!--td th:text="${ledger.balance}"></td-->
+                    <!--td th:text="${ledger.balanceUpdateDate}"></td-->
+                    <td th:text="${ledger.getShareConfig()}"></td>
+
                     <td th:text="${ledger.enable}"></td>
                     <td th:text="${ledger.type}"></td>
                     <td th:text="${ledger.label}"></td>
