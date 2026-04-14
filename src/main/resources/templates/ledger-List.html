@@ -37,6 +37,7 @@
                     <th>Statement</th>
                     <th>Ledger Name</th>
                     <th>isEmployee</th>
+                    <th>isJe</th>
                     <th>Invoice Payment Share</th>
 
                     <th>Enable</th>
@@ -47,6 +48,8 @@
                     <th>Valid To</th>
                     <th>Invoice Ledger</th>
                     <th>action</th>
+                    <th>Missing TS</th>
+
                 </tr>
                 </thead>
 
@@ -73,6 +76,7 @@
                     <td th:text="${ledger.isEmployee}"></td>
                     <!--td th:text="${ledger.balance}"></td-->
                     <!--td th:text="${ledger.balanceUpdateDate}"></td-->
+                    <td th:text="${ledger.isJournalEntryPossible}"></td>
                     <td th:text="${ledger.getShareConfig()}"></td>
 
                     <td th:text="${ledger.enable}"></td>
@@ -102,6 +106,7 @@
 
                         </a>
                     </td>
+                    <td th:text="${ledger.missingTimsheet}"></td>
                 </tr>
                 </tbody>
             </table>

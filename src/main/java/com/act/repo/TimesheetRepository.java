@@ -18,6 +18,19 @@ public interface TimesheetRepository extends JpaRepository<TimeSheet, Long> {
     @Query(
             "SELECT t FROM TimeSheet t " +
                     "WHERE t.employee = :employee " +
+                    "AND t.invoiceDetail is  null " +
+                    "AND t.startDate <= :endDate " +
+                    "AND t.endDate >= :startDate"
+    )
+    List<TimeSheet> findCollidingTimeSheets(
+            @Param("employee") Ledger employee,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query(
+            "SELECT t FROM TimeSheet t " +
+                    "WHERE t.employee = :employee " +
                     "AND (:id IS NULL OR t.id <> :id) " +
                     "AND t.startDate <= :endDate " +
                     "AND t.endDate >= :startDate"
@@ -43,5 +56,9 @@ public interface TimesheetRepository extends JpaRepository<TimeSheet, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
-
+    List<TimeSheet> findByEmployeeAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateAsc(
+            Ledger employee,
+            LocalDate endDate,
+            LocalDate startDate
+    );
 }

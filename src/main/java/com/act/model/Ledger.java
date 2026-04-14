@@ -27,6 +27,11 @@ public class Ledger {
     private BigDecimal balance;
     @Column(nullable = false)
     private String isEmployee; //true or false
+
+
+    @Column(nullable = true)
+    private String isJournalEntryPossible; //true or false
+
     @Column(nullable = false)
     private String type; //Equity  or liability or Asset or Expense
     @Column(nullable = false)
@@ -67,8 +72,6 @@ public class Ledger {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
 
     public String getConfig() {
@@ -190,5 +193,13 @@ public class Ledger {
 
     public void setInvoiceCreationType(String invoiceCreationType) {
         this.invoiceCreationType = invoiceCreationType;
+    }
+
+    public String getIsJournalEntryPossible() {
+        return isJournalEntryPossible;
+    }
+
+    public void setIsJournalEntryPossible(String isJournalEntryPossible) {
+        this.isJournalEntryPossible = isJournalEntryPossible;
     }
 }

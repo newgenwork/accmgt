@@ -1,9 +1,6 @@
 package com.act.web.controller;
 
-import com.act.dto.InvoiceFilter;
-import com.act.dto.InvoiceMasterDto;
-import com.act.dto.LedgerDto;
-import com.act.dto.TransactionDto;
+import com.act.dto.*;
 import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
@@ -37,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("api/v1/")
@@ -229,6 +227,7 @@ public class MainController {
             t.get().setCompanyAddress(ledger.getCompanyAddress());
             t.get().setInvoiceLedger(ledger.getInvoiceLedger());
             t.get().setInvoiceCreationType(ledger.getInvoiceCreationType());
+            t.get().setIsJournalEntryPossible(ledger.getIsJournalEntryPossible());
             ledgerRepository.save(t.get());
             return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 
@@ -248,7 +247,8 @@ public class MainController {
 
     @GetMapping("/ledger/list")
     public String listLedgers(Model model) {
-
+        DateTimeFormatter dateFormatter =
+                DateTimeFormatter.ofPattern("MM/dd/yyyy");
         List<Ledger> retList = ledgerRepository.findAll();
         List<LedgerDto> retListDto = new ArrayList<LedgerDto>();
                 Iterator<Ledger> it = retList.iterator();
@@ -291,6 +291,15 @@ public class MainController {
             dto.setInvoiceLedger(led.getInvoiceLedger());
             dto.setInvoiceCreationType(led.getInvoiceCreationType());
             dto.setType(led.getType());
+            dto.setIsJournalEntryPossible(led.getIsJournalEntryPossible());
+            if (led.getIsEmployee().equalsIgnoreCase("Y") && led.getLabel().equalsIgnoreCase("employee")) {
+                List<DateRange> dateRanges = findMissingTimeSheetRanges(led, led.getInvoiceRateValidateFromDate(), LocalDate.now());
+                String result = dateRanges.stream()
+                        .map(dr -> dr.getStartDate().format(dateFormatter) + " -> " + dr.getEndDate().format(dateFormatter))
+                        .collect(Collectors.joining("\n"));
+
+                dto.setMissingTimsheet(result);
+            }
             retListDto.add(dto);
         }
 
@@ -298,7 +307,57 @@ public class MainController {
         return "ledger-List";
     }
 
+    public List<DateRange> findMissingTimeSheetRanges(
+            Ledger employee,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
 
+        List<TimeSheet> sheets =
+                timesheetRepository
+                        .findByEmployeeAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateAsc(
+                                employee, endDate, startDate
+                        );
+
+        List<DateRange> missingRanges = new ArrayList<>();
+
+        // ✅ No timesheets at all → full range missing
+        if (sheets.isEmpty()) {
+            missingRanges.add(new DateRange(startDate, endDate));
+            return missingRanges;
+        }
+
+        // ✅ Check gap before first entry
+        LocalDate firstStart = sheets.get(0).getStartDate();
+        if (startDate.isBefore(firstStart)) {
+            missingRanges.add(
+                    new DateRange(startDate, firstStart.minusDays(1))
+            );
+        }
+
+        // ✅ Gaps between entries
+        for (int i = 1; i < sheets.size(); i++) {
+            LocalDate prevEnd = sheets.get(i - 1).getEndDate();
+            LocalDate currStart = sheets.get(i).getStartDate();
+
+            LocalDate gapStart = prevEnd.plusDays(1);
+            LocalDate gapEnd = currStart.minusDays(1);
+
+            if (!gapStart.isAfter(gapEnd)) {
+                missingRanges.add(new DateRange(gapStart, gapEnd));
+            }
+        }
+
+        // ✅ Check gap after last entry
+        LocalDate lastEnd = sheets.get(sheets.size() - 1).getEndDate();
+        if (endDate.isAfter(lastEnd)) {
+            missingRanges.add(
+                    new DateRange(lastEnd.plusDays(1), endDate)
+            );
+        }
+
+        return missingRanges;
+    }
 
     @GetMapping("/invoicesMaster/edit/{reference}")
     public String showEditInvoiceForm(Model model, @PathVariable String reference) {
@@ -367,8 +426,15 @@ public class MainController {
             invd.setEmployee(local);
             invd.setNoOfHrs(timesheetRepository.getTotalHoursByEmployeeAndDateRange(local.getId(),
                     invoiceFilter.getStartDate(),invoiceFilter.getEndDate()));
+            invd.setAmount(invd.getRate().multiply(invd.getNoOfHrs()));
             if (invd.getNoOfHrs().compareTo(BigDecimal.ZERO) ==0) {
-                return "redirect:/api/v1/invoicesMaster/filter?error=Employee Not having hrs for " + local.getLedgerName() ;
+               /* return "redirect:/api/v1/invoicesMaster/filter?error=Employee Not having hrs for "
+                        + local.getLedgerName()
+                        + " for "
+                        +  invoiceFilter.getStartDate()
+                        + " - "
+                        + invoiceFilter.getEndDate();*/
+                continue;
             }
 
             invd.setStartDate(invoiceFilter.getStartDate());
@@ -376,6 +442,13 @@ public class MainController {
 
 
             invoiceMaster.getDetails().add(invd);
+        }
+        if (invoiceMaster.getDetails().isEmpty()) {
+            return "redirect:/api/v1/invoicesMaster/filter?error=Employee Not having hrs"
+                    + " for "
+                    +  invoiceFilter.getStartDate()
+                    + " - "
+                    + invoiceFilter.getEndDate();
         }
         invoiceMaster.setReference("INV-" + sequenceRepository.getNextInvoiceSequence().toString());
         invoiceMaster.setStatus("INIT");
@@ -496,18 +569,16 @@ public class MainController {
                         invoiceMasterEdit.getDetails().get(i).setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
                         invoiceMasterEdit.getDetails().get(i).setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
 
-                        List<TimeSheet> tsList = timesheetRepository.findCollidingTimeSheets(invoiceMaster.getDetails().get(i).getEmployee(),
+                       /* List<TimeSheet> tsList = timesheetRepository.findCollidingTimeSheets(invoiceMaster.getDetails().get(i).getEmployee(),
                                 invoiceMaster.getDetails().get(i).getStartDate(),
                                 invoiceMaster.getDetails().get(i).getEndDate(), null);
 
                         for (TimeSheet timeSheet : tsList) {
                             timeSheet.setInvoiceDetail(invoiceMasterEdit.getDetails().get(i));
                             timesheetRepository.save(timeSheet);
-                        }
+                        }*/
 
 
-                    } else {
-                        break;
                     }
                 }
 
@@ -547,16 +618,30 @@ public class MainController {
                         }
                         InvoiceDetail invd = new InvoiceDetail();
                         invoiceMasterLocal.getDetails().add(invd);
-
-                        invd.setAmount(invoiceMaster.getDetails().get(i).getAmount());
+                        //invd.setAmount(invoiceMaster.getDetails().get(i).getAmount());
                         invd.setEmployee(invoiceMaster.getDetails().get(i).getEmployee());
                         invd.setRate(invoiceMaster.getDetails().get(i).getRate());
-                        invd.setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
-                        invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
                         invd.setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
+                        invd.setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
+
+                        //invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
+
+                        invd.setNoOfHrs(timesheetRepository.getTotalHoursByEmployeeAndDateRange(invd.getEmployee().getId(),
+                                invd.getStartDate(),invd.getEndDate()));
+                        invd.setAmount(invd.getRate().multiply(invd.getNoOfHrs()));
+
                         invd.setInvoiceMaster(invoiceMasterLocal);
                         if (invoiceMasterLocal.getStatus().equalsIgnoreCase("INIT")) {
                             invoiceMasterLocal.setStatus("DRAFT");
+                        }
+                        List<TimeSheet> tsList = timesheetRepository.findCollidingTimeSheets(
+                                invd.getEmployee(),
+                                invd.getStartDate(),
+                                invd.getEndDate());
+
+                        for (TimeSheet timeSheet : tsList) {
+                            timeSheet.setInvoiceDetail(invd);
+                            timesheetRepository.save(timeSheet);
                         }
                         invoiceMasterRepository.save(invoiceMasterLocal);
                     }
@@ -575,6 +660,7 @@ public class MainController {
                 //invoiceMasterEdit.setId(invoiceMaster.getId());
 
                 long line = 0;
+                Map<TimeSheet,InvoiceDetail> tsMapSave = new HashMap<>();
                 for (int i = 0; i < invoiceMaster.getDetails().size(); i++) {
                     if (invoiceMaster.getDetails().get(i).getEmployee() != null) {
                         if (invoiceMasterEdit.getDetails() == null) {
@@ -584,17 +670,42 @@ public class MainController {
                         invoiceMasterEdit.getDetails().add(invd);
                         //line = line + 1;
                         //invd.setId(line);
-                        invd.setAmount(invoiceMaster.getDetails().get(i).getAmount());
+                        //invd.setAmount(invoiceMaster.getDetails().get(i).getAmount());
                         invd.setEmployee(invoiceMaster.getDetails().get(i).getEmployee());
                         invd.setRate(invoiceMaster.getDetails().get(i).getRate());
-                        invd.setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
-                        invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
                         invd.setStartDate(invoiceMaster.getDetails().get(i).getStartDate());
+                        invd.setEndDate(invoiceMaster.getDetails().get(i).getEndDate());
+                        //invd.setNoOfHrs(invoiceMaster.getDetails().get(i).getNoOfHrs());
+
+                        invd.setNoOfHrs(timesheetRepository.getTotalHoursByEmployeeAndDateRange(
+                                invoiceMaster.getDetails().get(i).getEmployee().getId(),
+                                invoiceMaster.getDetails().get(i).getStartDate(),
+                                invoiceMaster.getDetails().get(i).getEndDate()));
+                        invd.setAmount(invd.getRate().multiply(invd.getNoOfHrs()));
+
                         invd.setInvoiceMaster(invoiceMasterEdit);
+                        List<TimeSheet> tsList = timesheetRepository.findCollidingTimeSheets(
+                                invd.getEmployee(),
+                                invd.getStartDate(),
+                                invd.getEndDate());
+
+                        for (TimeSheet timeSheet : tsList) {
+                            //timeSheet.setInvoiceDetail(invd);
+                            //tsListSave.add(timeSheet);
+                            tsMapSave.put(timeSheet, invd);
+                            //timesheetRepository.save(timeSheet);
+                        }
                     }
 
                 }
                 invoiceMasterRepository.save(invoiceMasterEdit);
+
+                Iterator<TimeSheet> itTsList = tsMapSave.keySet().iterator();
+                while (itTsList.hasNext()) {
+                    TimeSheet tm = itTsList.next();
+                    tm.setInvoiceDetail(tsMapSave.get(tm));
+                    timesheetRepository.save(tm);
+                }
 
             }
 
@@ -801,7 +912,7 @@ public class MainController {
        // je.setId(UUID.randomUUID().toString());
         je.setId("JN-" + sequenceRepository.getNextInvoiceSequence().toString());
         model.addAttribute("journal", je);
-        Optional<List<Ledger>> clients = ledgerRepository.findByType("Expense");
+        Optional<List<Ledger>> clients = ledgerRepository.findByTypeAndIsJournalEntryPossible("Expense", "Y");
         model.addAttribute("clients", clients.get());
 
 
@@ -844,6 +955,7 @@ public class MainController {
                     je = new JournalEntry();
                 }
                 je.setId(journalEntry.getId());
+
                 je.setTransactionDate(journalEntry.getTransactionDate());
                 if (ea.getType().equals("source")) {
                     je.setAmount(journalEntry.getAmount());

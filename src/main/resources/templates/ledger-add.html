@@ -58,6 +58,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="control-label" for="isJournalEntryPossible">
+                        isJournalEntryPossible
+                    </label>
+                    <select id="isJournalEntryPossible" class="form-control" th:field="*{ledger.isJournalEntryPossible}"  required autofocus="autofocus">
+
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
                     <label class="control-label" for="enable">
                         Enable Flag
                     </label>

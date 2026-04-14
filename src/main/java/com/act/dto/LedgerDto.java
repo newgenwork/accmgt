@@ -20,6 +20,8 @@ public class LedgerDto {
     private String enable;
     private BigDecimal balance;
     private String isEmployee; //true or false
+    private String isJournalEntryPossible; //true or false
+
     private String type; //Equity  or liability or Asset or Expense
     private LocalDateTime balanceUpdateDate;
 
@@ -37,6 +39,7 @@ public class LedgerDto {
 
     private String invoiceCreationType ; //batch or consolidated
 
+    private String missingTimsheet;
 
     public Long getId() {
         return id;
@@ -176,5 +179,21 @@ public class LedgerDto {
 
     public void setShareConfig(String shareConfig) {
         this.shareConfig = shareConfig;
+    }
+
+    public String getIsJournalEntryPossible() {
+        return isJournalEntryPossible;
+    }
+
+    public void setIsJournalEntryPossible(String isJournalEntryPossible) {
+        this.isJournalEntryPossible = isJournalEntryPossible;
+    }
+
+    public String getMissingTimsheet() {
+        return missingTimsheet;
+    }
+
+    public void setMissingTimsheet(String missingTimsheet) {
+        this.missingTimsheet = missingTimsheet;
     }
 }
