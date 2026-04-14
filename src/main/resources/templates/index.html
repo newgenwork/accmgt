@@ -34,6 +34,16 @@
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list}">View Ledger</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee}">View Ledger (only Employees)</a></li>
+				</ul>
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=AP}">View Ledger (only AP)</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=AR}">View Ledger (only AR)</a></li>
+				</ul>
+				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/add}">Add Ledger</a></li>
 				</ul>
 				----

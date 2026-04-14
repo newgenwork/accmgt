@@ -246,7 +246,10 @@ public class MainController {
 
 
     @GetMapping("/ledger/list")
-    public String listLedgers(Model model) {
+
+    public String listLedgers(
+            @RequestParam(name = "label", required = false) String label,
+            Model model) {
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
         List<Ledger> retList = ledgerRepository.findAll();
@@ -255,6 +258,9 @@ public class MainController {
 
         while (it.hasNext()) {
             Ledger led = it.next();
+            if (label !=null & led.getLabel() != null &&  !led.getLabel().equals(label)) {
+                continue;
+            }
             LedgerDto dto = new LedgerDto();
             dto.setId(led.getId());
             dto.setBalance(led.getBalance());
