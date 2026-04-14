@@ -292,7 +292,10 @@ public class MainController {
             dto.setInvoiceCreationType(led.getInvoiceCreationType());
             dto.setType(led.getType());
             dto.setIsJournalEntryPossible(led.getIsJournalEntryPossible());
-            if (led.getIsEmployee().equalsIgnoreCase("Y") && led.getLabel().equalsIgnoreCase("employee")) {
+            if (led.getIsEmployee().equalsIgnoreCase("Y") &&
+                    led.getLabel().equalsIgnoreCase("employee") &&
+                    led.getInvoiceRateValidateFromDate()!=null &&
+                    led.getInvoiceRateValidateToDate()!=null) {
                 List<DateRange> dateRanges = findMissingTimeSheetRanges(led, led.getInvoiceRateValidateFromDate(), LocalDate.now());
                 String result = dateRanges.stream()
                         .map(dr -> dr.getStartDate().format(dateFormatter) + " -> " + dr.getEndDate().format(dateFormatter))
