@@ -43,6 +43,14 @@
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=AR}">View Ledger (only AR)</a></li>
 				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=vendor}">View Ledger (only Vendor)</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=cash}">View Ledger (only cash)</a></li>
+				</ul>
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/add}">Add Ledger</a></li>
 				</ul>
