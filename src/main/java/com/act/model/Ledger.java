@@ -62,7 +62,7 @@ public class Ledger {
     private String companyAddress;
 
     @Column(nullable = true)
-    private String invoiceCreationType ; //batch or consolidated
+    private String invoiceCreationType ; //SINGLE or consolidated
 
 
     public Long getId() {

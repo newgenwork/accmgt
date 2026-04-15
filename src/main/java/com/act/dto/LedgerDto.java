@@ -26,10 +26,11 @@ public class LedgerDto {
     private LocalDateTime balanceUpdateDate;
 
     private BigDecimal invoiceRate;
+    @DateTimeFormat(pattern = "MM-dd-YYYY")
     private LocalDate invoiceRateValidateFromDate;
 
+    @DateTimeFormat(pattern = "MM-dd-YYYY")
     private LocalDate invoiceRateValidateToDate;
-
 
     private Ledger invoiceLedger;
 

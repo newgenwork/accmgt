@@ -202,6 +202,9 @@ public class MainController {
     // Show form
     @GetMapping("/ledger/add")
     public String showAddLedgerForm(Model model) {
+
+        //Ledger ledger = new Ledger();
+        //ledger.setId(sequenceRepository.getNextInvoiceSequence());
         model.addAttribute("ledger", new Ledger());
 
         Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
@@ -212,8 +215,14 @@ public class MainController {
     // Handle submit
     @PostMapping("/ledger/add")
     public String saveLedger(@ModelAttribute Ledger ledger) {
-        Optional<Ledger> t = ledgerRepository.findByLedgerName(ledger.getLedgerName());
-        if (t.isPresent()) {
+
+        Optional<Ledger> t = null;
+        if (ledger.getId() != null) {
+           t = ledgerRepository.findById(ledger.getId());
+        }
+
+        if (t!=null && t.isPresent()) {
+            t.get().setLedgerName(ledger.getLedgerName());
             t.get().setConfig(ledger.getConfig());
             t.get().setEnable(ledger.getEnable());
             //t.get().setBalance(ledger.getBalance());
@@ -245,8 +254,31 @@ public class MainController {
     }
 
 
-    @GetMapping("/ledger/list")
+    public String getEventConfiguration(String eventName, Ledger led) {
 
+
+            String retString = "";
+            Event invoicePaymentEvent = getConfigEvent(led, eventName);
+            if (invoicePaymentEvent != null) {
+                List<EventAction> listEventActions = invoicePaymentEvent.getEventConfig().getEventAction();
+                Iterator<EventAction> itlistEventActions = listEventActions.iterator();
+
+                while (itlistEventActions.hasNext()) {
+                    EventAction eventAction = itlistEventActions.next();
+                    if (eventAction != null) {
+                        retString = (retString + "|" + eventName + ": "
+                                + eventAction.getFromLedgerName() + "=>"
+                                + eventAction.getToLedgerName() + ":"
+                                + eventAction.getType() + ":"
+                                + eventAction.getAmountRatePerHour() + "|");
+                    }
+                }
+            }
+
+
+    return retString;
+    }
+    @GetMapping("/ledger/list")
     public String listLedgers(
             @RequestParam(name = "label", required = false) String label,
             Model model) {
@@ -266,23 +298,11 @@ public class MainController {
             dto.setBalance(led.getBalance());
             dto.setBalanceUpdateDate(led.getBalanceUpdateDate());
             dto.setConfig(led.getConfig());
-            Event invoicePaymentEvent = getConfigEvent(led, "invoicePayment");
-            dto.setShareConfig("");
-            if (invoicePaymentEvent!=null) {
-                List<EventAction> listEventActions = invoicePaymentEvent.getEventConfig().getEventAction();
-                Iterator<EventAction> itlistEventActions = listEventActions.iterator();
 
-                while (itlistEventActions.hasNext()) {
-                    EventAction eventAction = itlistEventActions.next();
-                    if (eventAction!=null) {
-                        dto.setShareConfig(dto.getShareConfig() + "|"
-                                + eventAction.getFromLedgerName() + "=>"
-                                + eventAction.getToLedgerName() + ":"
-                                + eventAction.getType() + ":"
-                                + eventAction.getAmountRatePerHour() + "|");
-                    }
-                }
-            }
+            dto.setShareConfig(getEventConfiguration("invoicePayment", led));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("invoice", led));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Non Client Billable Hrs Payment to AP", led));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Release Payment to Vendor/Candidate", led));
 
             dto.setLedgerName(led.getLedgerName());
             dto.setIsEmployee(led.getIsEmployee());
@@ -298,21 +318,22 @@ public class MainController {
             dto.setInvoiceCreationType(led.getInvoiceCreationType());
             dto.setType(led.getType());
             dto.setIsJournalEntryPossible(led.getIsJournalEntryPossible());
+            dto.setInvoiceCreationType(led.getInvoiceCreationType());
             if (led.getIsEmployee().equalsIgnoreCase("Y") &&
                     led.getLabel().equalsIgnoreCase("employee") &&
                     led.getInvoiceRateValidateFromDate()!=null &&
                     led.getInvoiceRateValidateToDate()!=null) {
                 List<DateRange> dateRanges = findMissingTimeSheetRanges(led, led.getInvoiceRateValidateFromDate(), LocalDate.now());
                 String result = dateRanges.stream()
-                        .map(dr -> dr.getStartDate().format(dateFormatter) + " -> " + dr.getEndDate().format(dateFormatter))
+                        .map(dr -> dr.getStartDate().format(dateFormatter) + " - " + dr.getEndDate().format(dateFormatter))
                         .collect(Collectors.joining("\n"));
 
                 dto.setMissingTimsheet(result);
             }
             retListDto.add(dto);
         }
-
         model.addAttribute("ledgers", retListDto);
+        model.addAttribute("totalCount", retListDto.size()); // ✅ ADD THIS
         return "ledger-List";
     }
 

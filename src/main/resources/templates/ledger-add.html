@@ -34,6 +34,7 @@
                     <label class="control-label" for="ledgerName">
                         Ledger Name
                     </label>
+                    <input id="id" type="hidden" class="form-control" th:field="*{ledger.id}" required autofocus="autofocus">
                     <input id="ledgerName" class="form-control" th:field="*{ledger.ledgerName}" required autofocus="autofocus">
                 </div>
 

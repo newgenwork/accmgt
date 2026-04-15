@@ -28,7 +28,14 @@
                 </div>
             </div>
 
-            <h1>View Ledger</h1>
+
+            <h1>
+                View Ledger
+                <span class="badge badge-primary ml-2"
+                      th:text="${totalCount}">
+    </span>
+            </h1>
+
 
             <table class="table table-bordered table-striped table-hover">
                 <thead>
@@ -46,6 +53,7 @@
                     <th>Invoice Rate</th>
                     <th>Valid From</th>
                     <th>Valid To</th>
+                    <th>invCreateType</th>
                     <th>Invoice Ledger</th>
                     <th>action</th>
                     <th>Missing TS</th>
@@ -85,6 +93,7 @@
                     <td th:text="${ledger.invoiceRate}"></td>
                     <td th:text="${ledger.invoiceRateValidateFromDate}"></td>
                     <td th:text="${ledger.invoiceRateValidateToDate}"></td>
+                    <td th:text="${ledger.invoiceCreationType}"></td>
                     <td>
 
                         <span th:text="${ledger.invoiceLedger?.ledgerName}"></span>
