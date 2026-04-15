@@ -24,7 +24,7 @@ public class LedgerDto {
 
     private String type; //Equity  or liability or Asset or Expense
     private LocalDateTime balanceUpdateDate;
-
+    private BigDecimal companyHourRate;
     private BigDecimal invoiceRate;
     @DateTimeFormat(pattern = "MM-dd-YYYY")
     private LocalDate invoiceRateValidateFromDate;
@@ -196,5 +196,13 @@ public class LedgerDto {
 
     public void setMissingTimsheet(String missingTimsheet) {
         this.missingTimsheet = missingTimsheet;
+    }
+
+    public BigDecimal getCompanyHourRate() {
+        return companyHourRate;
+    }
+
+    public void setCompanyHourRate(BigDecimal companyHourRate) {
+        this.companyHourRate = companyHourRate;
     }
 }

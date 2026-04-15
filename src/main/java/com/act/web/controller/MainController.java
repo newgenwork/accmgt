@@ -253,22 +253,35 @@ public class MainController {
 
     }
 
+    private String appendError(String ledgerName, Set<String> ledset) {
+        if (ledset.contains(ledgerName)) {
+            return ledgerName;
+        } else {
 
-    public String getEventConfiguration(String eventName, Ledger led) {
-
-
+            return ledgerName + "___ERROR__";
+        }
+    }
+    public String getEventConfiguration(String eventName, Ledger led, Set<String> ledset,
+                                        LedgerDto ledgerDto, boolean updateDto) {
             String retString = "";
             Event invoicePaymentEvent = getConfigEvent(led, eventName);
             if (invoicePaymentEvent != null) {
                 List<EventAction> listEventActions = invoicePaymentEvent.getEventConfig().getEventAction();
                 Iterator<EventAction> itlistEventActions = listEventActions.iterator();
-
+                if (updateDto) {
+                    ledgerDto.setCompanyHourRate(led.getInvoiceRate());
+                }
                 while (itlistEventActions.hasNext()) {
                     EventAction eventAction = itlistEventActions.next();
                     if (eventAction != null) {
+                        if (updateDto) {
+                            ledgerDto.setCompanyHourRate(
+                                    ledgerDto.getCompanyHourRate().subtract(eventAction.getAmountRatePerHour()));
+                        }
+
                         retString = (retString + "|" + eventName + ": "
-                                + eventAction.getFromLedgerName() + "=>"
-                                + eventAction.getToLedgerName() + ":"
+                                + appendError(eventAction.getFromLedgerName(),ledset) + "=>"
+                                + appendError(eventAction.getToLedgerName(), ledset) + ":"
                                 + eventAction.getType() + ":"
                                 + eventAction.getAmountRatePerHour() + "|");
                     }
@@ -288,6 +301,12 @@ public class MainController {
         List<LedgerDto> retListDto = new ArrayList<LedgerDto>();
                 Iterator<Ledger> it = retList.iterator();
 
+        Set<String> ledgerNames =
+                retList.stream()
+                        .map(Ledger::getLedgerName)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+        BigDecimal totalAmountRate = BigDecimal.ZERO;
         while (it.hasNext()) {
             Ledger led = it.next();
             if (label !=null & led.getLabel() != null &&  !led.getLabel().equals(label)) {
@@ -299,10 +318,17 @@ public class MainController {
             dto.setBalanceUpdateDate(led.getBalanceUpdateDate());
             dto.setConfig(led.getConfig());
 
-            dto.setShareConfig(getEventConfiguration("invoicePayment", led));
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("invoice", led));
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Non Client Billable Hrs Payment to AP", led));
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Release Payment to Vendor/Candidate", led));
+            if (led.getLabel() != null &&  led.getLabel().equals("employee")) {
+                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, true));
+
+                totalAmountRate = totalAmountRate.add(dto.getCompanyHourRate());
+            } else {
+                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, false));
+            }
+
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("invoice", led, ledgerNames, dto, false));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Non Client Billable Hrs Payment to AP", led,ledgerNames, dto, false));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Release Payment to Vendor/Candidate", led,ledgerNames, dto, false));
 
             dto.setLedgerName(led.getLedgerName());
             dto.setIsEmployee(led.getIsEmployee());
@@ -333,7 +359,8 @@ public class MainController {
             retListDto.add(dto);
         }
         model.addAttribute("ledgers", retListDto);
-        model.addAttribute("totalCount", retListDto.size()); // ✅ ADD THIS
+        model.addAttribute("totalCount", retListDto.size());
+        model.addAttribute("totalAmountRate", totalAmountRate);// ✅ ADD THIS
         return "ledger-List";
     }
 

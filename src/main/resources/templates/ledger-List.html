@@ -33,6 +33,13 @@
                 View Ledger
                 <span class="badge badge-primary ml-2"
                       th:text="${totalCount}">
+
+                    totalAmountRate
+    </span>
+                <span class="badge badge-primary ml-2"
+                      th:text="${totalAmountRate}">
+
+
     </span>
             </h1>
 
@@ -57,7 +64,7 @@
                     <th>Invoice Ledger</th>
                     <th>action</th>
                     <th>Missing TS</th>
-
+                    <th>Company Rate</th>
                 </tr>
                 </thead>
 
@@ -116,6 +123,8 @@
                         </a>
                     </td>
                     <td th:text="${ledger.missingTimsheet}"></td>
+                    <td th:text="${ledger.companyHourRate}"></td>
+
                 </tr>
                 </tbody>
             </table>
