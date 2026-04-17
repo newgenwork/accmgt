@@ -42,6 +42,9 @@ public class LedgerDto {
 
     private String missingTimsheet;
 
+    private String endClientName ;
+
+
     public Long getId() {
         return id;
     }
@@ -204,5 +207,13 @@ public class LedgerDto {
 
     public void setCompanyHourRate(BigDecimal companyHourRate) {
         this.companyHourRate = companyHourRate;
+    }
+
+    public String getEndClientName() {
+        return endClientName;
+    }
+
+    public void setEndClientName(String endClientName) {
+        this.endClientName = endClientName;
     }
 }

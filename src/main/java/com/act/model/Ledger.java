@@ -62,7 +62,10 @@ public class Ledger {
     private String companyAddress;
 
     @Column(nullable = true)
-    private String invoiceCreationType ; //SINGLE or consolidated
+    private String invoiceCreationType ; //SINGLE or BATCH
+
+    @Column(nullable = true)
+    private String endClientName ;
 
 
     public Long getId() {
@@ -201,5 +204,13 @@ public class Ledger {
 
     public void setIsJournalEntryPossible(String isJournalEntryPossible) {
         this.isJournalEntryPossible = isJournalEntryPossible;
+    }
+
+    public String getEndClientName() {
+        return endClientName;
+    }
+
+    public void setEndClientName(String endClientName) {
+        this.endClientName = endClientName;
     }
 }

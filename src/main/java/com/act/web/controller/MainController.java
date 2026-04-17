@@ -237,6 +237,7 @@ public class MainController {
             t.get().setInvoiceLedger(ledger.getInvoiceLedger());
             t.get().setInvoiceCreationType(ledger.getInvoiceCreationType());
             t.get().setIsJournalEntryPossible(ledger.getIsJournalEntryPossible());
+            t.get().setEndClientName(ledger.getEndClientName());
             ledgerRepository.save(t.get());
             return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 
@@ -345,6 +346,7 @@ public class MainController {
             dto.setType(led.getType());
             dto.setIsJournalEntryPossible(led.getIsJournalEntryPossible());
             dto.setInvoiceCreationType(led.getInvoiceCreationType());
+            dto.setEndClientName(led.getEndClientName());
             if (led.getIsEmployee().equalsIgnoreCase("Y") &&
                     led.getLabel().equalsIgnoreCase("employee") &&
                     led.getInvoiceRateValidateFromDate()!=null &&
