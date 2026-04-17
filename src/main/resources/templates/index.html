@@ -48,6 +48,18 @@
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=vendor}">View Ledger (only Vendor)</a></li>
 				</ul>
 
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=wellsfargo}">View Ledger (Employees for end Client wellsfargo)</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=omron}">View Ledger (Employees for endClient omron)</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=Morgan Stanley}">View Ledger (Employees for endclient Morgan Stanley)</a></li>
+				</ul>
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=cash}">View Ledger (only cash)</a></li>
 				</ul>
@@ -58,23 +70,17 @@
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/list}">View Invoices Masters</a></li>
 				</ul>
-				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/filter}">Add Invoice Master</a></li>
-				</ul>
+
 				----
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">View Journals</a></li>
 				</ul>
-				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/add}">Add Journal</a></li>
-				</ul>
+
 				----
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/list}">View Timesheets</a></li>
 				</ul>
-				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/add}">Add Timesheet</a></li>
-				</ul>
+
 
 
 			</div>

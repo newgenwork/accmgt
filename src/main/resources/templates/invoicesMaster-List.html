@@ -30,7 +30,9 @@
                 </div>
             </div>
 
-
+            <ul class="nav navbar-nav">
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/filter}">Add Invoice Master</a></li>
+            </ul>
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>

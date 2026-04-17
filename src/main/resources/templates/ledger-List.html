@@ -126,18 +126,31 @@
 </div>
 
 <h1>
-    
+
     <span class="badge badge-primary ml-2"
           th:text="${totalCount}">
 
 
     </span>
-    <span class="badge badge-primary ml-2"
-          th:text="${totalAmountRate}">
 
-
-    </span>
 </h1>
+
+
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+    <tr>
+        <th>Ledger Name</th>
+        <th>Total Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${ledgerTotals}">
+        <td th:text="${entry.key}"></td>
+        <td th:text="${entry.value}"></td>
+    </tr>
+    </tbody>
+</table>
+
 
 </body>
 </html>

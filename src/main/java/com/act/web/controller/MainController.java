@@ -263,7 +263,7 @@ public class MainController {
         }
     }
     public String getEventConfiguration(String eventName, Ledger led, Set<String> ledset,
-                                        LedgerDto ledgerDto, boolean updateDto) {
+                                        LedgerDto ledgerDto, boolean updateDto, Map<String, BigDecimal> totalAmountRateMap) {
             String retString = "";
             Event invoicePaymentEvent = getConfigEvent(led, eventName);
             if (invoicePaymentEvent != null) {
@@ -278,6 +278,14 @@ public class MainController {
                         if (updateDto) {
                             ledgerDto.setCompanyHourRate(
                                     ledgerDto.getCompanyHourRate().subtract(eventAction.getAmountRatePerHour()));
+
+                            if (totalAmountRateMap.get(eventAction.getToLedgerName()) == null) {
+                                    totalAmountRateMap.put(eventAction.getToLedgerName(), new BigDecimal(0));
+                                }
+                            totalAmountRateMap.put(eventAction.getToLedgerName(),
+                                    totalAmountRateMap.get(eventAction.getToLedgerName()).add(eventAction.getAmountRatePerHour()));
+
+
                         }
 
                         retString = (retString + "|" + eventName + ": "
@@ -287,6 +295,13 @@ public class MainController {
                                 + eventAction.getAmountRatePerHour() + "|");
                     }
                 }
+
+                if (updateDto) {
+                    if (totalAmountRateMap.get("Megson-AP") == null) {
+                        totalAmountRateMap.put("Megson-AP", new BigDecimal(0));
+                    }
+                    totalAmountRateMap.put("Megson-AP", totalAmountRateMap.get("Megson-AP").add(ledgerDto.getCompanyHourRate()));
+                }
             }
 
 
@@ -295,6 +310,7 @@ public class MainController {
     @GetMapping("/ledger/list")
     public String listLedgers(
             @RequestParam(name = "label", required = false) String label,
+            @RequestParam(name = "endClient", required = false) String endClient,
             Model model) {
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -307,10 +323,14 @@ public class MainController {
                         .map(Ledger::getLedgerName)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
-        BigDecimal totalAmountRate = BigDecimal.ZERO;
+        //BigDecimal totalAmountRate = BigDecimal.ZERO;
+        Map<String, BigDecimal> totalAmountRateMap = new HashMap<>();
         while (it.hasNext()) {
             Ledger led = it.next();
             if (label !=null & led.getLabel() != null &&  !led.getLabel().equals(label)) {
+                continue;
+            }
+            if (endClient !=null & led.getEndClientName() != null &&  !led.getEndClientName().equals(endClient)) {
                 continue;
             }
             LedgerDto dto = new LedgerDto();
@@ -320,16 +340,18 @@ public class MainController {
             dto.setConfig(led.getConfig());
 
             if (led.getLabel() != null &&  led.getLabel().equals("employee")) {
-                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, true));
+                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, true, totalAmountRateMap));
 
-                totalAmountRate = totalAmountRate.add(dto.getCompanyHourRate());
+                //totalAmountRate = totalAmountRate.add(dto.getCompanyHourRate()==null?BigDecimal.ZERO:dto.getCompanyHourRate());
+                //totalAmountRateMap.put("Megson", totalAmountRate);
+
             } else {
-                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, false));
+                dto.setShareConfig(getEventConfiguration("invoicePayment", led, ledgerNames, dto, false,totalAmountRateMap));
             }
 
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("invoice", led, ledgerNames, dto, false));
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Non Client Billable Hrs Payment to AP", led,ledgerNames, dto, false));
-            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Release Payment to Vendor/Candidate", led,ledgerNames, dto, false));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("invoice", led, ledgerNames, dto, false,totalAmountRateMap));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Non Client Billable Hrs Payment to AP", led,ledgerNames, dto, false,totalAmountRateMap));
+            dto.setShareConfig(dto.getShareConfig() + "   :   " + getEventConfiguration("Release Payment to Vendor/Candidate", led,ledgerNames, dto, false,totalAmountRateMap));
 
             dto.setLedgerName(led.getLedgerName());
             dto.setIsEmployee(led.getIsEmployee());
@@ -362,7 +384,8 @@ public class MainController {
         }
         model.addAttribute("ledgers", retListDto);
         model.addAttribute("totalCount", retListDto.size());
-        model.addAttribute("totalAmountRate", totalAmountRate);// ✅ ADD THIS
+        //model.addAttribute("totalAmountRate", totalAmountRateMap.get("Megson"));// ✅ ADD THIS
+        model.addAttribute("ledgerTotals", totalAmountRateMap);
         return "ledger-List";
     }
 

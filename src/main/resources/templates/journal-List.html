@@ -31,6 +31,10 @@
 
             <h1>View Journal Entry</h1>
 
+            <ul class="nav navbar-nav">
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/add}">Add Journal</a></li>
+            </ul>
+
             <table class="table table-bordered table-striped table-hover">
 
             <tr>
