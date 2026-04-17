@@ -386,6 +386,14 @@ public class MainController {
         model.addAttribute("totalCount", retListDto.size());
         //model.addAttribute("totalAmountRate", totalAmountRateMap.get("Megson"));// ✅ ADD THIS
         model.addAttribute("ledgerTotals", totalAmountRateMap);
+
+
+        BigDecimal ledgerTotalAmount = totalAmountRateMap.values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("ledgerTotalAmount", ledgerTotalAmount);
+
+
         return "ledger-List";
     }
 

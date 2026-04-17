@@ -126,11 +126,9 @@
 </div>
 
 <h1>
-
+    <span > Total Employees/Contractor : </span>
     <span class="badge badge-primary ml-2"
           th:text="${totalCount}">
-
-
     </span>
 
 </h1>
@@ -140,7 +138,7 @@
     <thead>
     <tr>
         <th>Ledger Name</th>
-        <th>Total Amount</th>
+        <th>Hourly Rate</th>
     </tr>
     </thead>
     <tbody>
@@ -150,7 +148,13 @@
     </tr>
     </tbody>
 </table>
+<h1>
+    <span > Hourly Rate (Revenue) : </span>
+    <span class="badge badge-primary ml-2"
+          th:text="${ledgerTotalAmount}">
+    </span>
 
+</h1>
 
 </body>
 </html>
