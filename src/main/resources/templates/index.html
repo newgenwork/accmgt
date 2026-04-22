@@ -50,16 +50,21 @@
 
 
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=wellsfargo}">View Ledger (Employees for end Client wellsfargo)</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=wellsfargo}">View Ledger (Employees for end client Wellsfargo)</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=omron}">View Ledger (Employees for endClient omron)</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=omron}">View Ledger (Employees for end client Omron)</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=Morgan Stanley}">View Ledger (Employees for endclient Morgan Stanley)</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=Morgan Stanley}">View Ledger (Employees for end client Morgan Stanley)</a></li>
 				</ul>
+
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=Barclays}">View Ledger (Employees for end client Barclays)</a></li>
+				</ul>
+
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=cash}">View Ledger (only cash)</a></li>
 				</ul>

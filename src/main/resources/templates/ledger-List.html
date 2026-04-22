@@ -100,11 +100,11 @@
                     </td>
                     <td>
 
-                        <!--div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
-                            <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>
-                            Create Invoice
+                        <div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
+                            <a th:href="@{/api/v1/ledger/list(label='employee',invoiceLedger=${ledger.ledgerName})}">
+                               Show Employees
                             </a>
-                        </div-->
+                        </div>
 
                         <!--div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
                             <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>

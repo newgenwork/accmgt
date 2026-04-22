@@ -311,6 +311,7 @@ public class MainController {
     public String listLedgers(
             @RequestParam(name = "label", required = false) String label,
             @RequestParam(name = "endClient", required = false) String endClient,
+            @RequestParam(name = "invoiceLedger", required = false) String invoiceLedger,
             Model model) {
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -331,6 +332,10 @@ public class MainController {
                 continue;
             }
             if (endClient !=null & led.getEndClientName() != null &&  !led.getEndClientName().equals(endClient)) {
+                continue;
+            }
+
+            if (invoiceLedger !=null & led.getInvoiceLedger() != null &&  !led.getInvoiceLedger().getLedgerName().equals(invoiceLedger)) {
                 continue;
             }
             LedgerDto dto = new LedgerDto();
