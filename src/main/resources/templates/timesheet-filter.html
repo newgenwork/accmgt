@@ -6,15 +6,14 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-
   <script>
     function loadEmployees() {
 
       const vendorId = document.getElementById("vendorId").value;
-      const empSelect = document.getElementById("employeeIds");
+      const empSelect = document.getElementById("employeeId");
 
-      // clear existing
-      empSelect.innerHTML = "";
+      // reset employee list
+      empSelect.innerHTML = '<option value="">-- Select Employee --</option>';
 
       if (!vendorId) {
         return;
@@ -25,14 +24,15 @@
               .then(employees => {
                 employees.forEach(emp => {
                   const option = document.createElement("option");
-                  option.value = emp.id;            // Ledger.id
-                  option.text  = emp.ledgerName;   // Ledger.ledgerName
+                  option.value = emp.id;          // Ledger.id
+                  option.text  = emp.ledgerName; // Ledger.ledgerName
                   empSelect.appendChild(option);
                 });
               })
-              .catch(err => console.error(err));
+              .catch(err => console.error("Employee load error:", err));
     }
   </script>
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -66,7 +66,7 @@
       </div>
 
 
-        <form action="/api/v1/timesheet/filter"  th:object="${timesheetFilter}" method="get">
+        <form action="/api/v1/timesheet/list"  th:object="${timesheetFilter}" method="get">
 
         <div class="form-group">
           <label for="vendorId">Vendor</label>
@@ -88,14 +88,15 @@
         </div>
           <div class="form-group">
 
-          <label for="employeeIds">Employees</label>
-          <select id="employeeIds"
-                  name="employeeIds"
-                  class="form-control"
-                  multiple
-                  size="6">
-          </select>
-    </div>
+
+            <label for="employeeId">Employee</label>
+            <select id="employeeId"
+                    name="employeeId"
+                    class="form-control">
+              <option value="">-- Select Employee --</option>
+            </select>
+
+          </div>
 
           <div class="form-group">
           <label class="control-label" for="startDate">

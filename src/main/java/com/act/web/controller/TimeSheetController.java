@@ -113,7 +113,8 @@ public class TimeSheetController {
 
     @GetMapping("/list")
     public String listTimeSheet(
-            @RequestParam(required = false) String ledgerName,
+            @RequestParam(required = false) String clientId,
+            @RequestParam(required = false) String employeeId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false)
@@ -130,7 +131,7 @@ public class TimeSheetController {
 
         List<TimeSheet> timeSheets =
                 timesheetRepository.findWithFilters(
-                        ledgerName, safeStart, safeEnd);
+                        employeeId, safeStart, safeEnd);
 
         timeSheets.sort(
                 Comparator.comparing(TimeSheet::getStartDate).reversed());
@@ -155,6 +156,9 @@ public class TimeSheetController {
     }
 
 
+
+
+
     @GetMapping("/vendors/{vendorId}/employees")
     @ResponseBody
     public List<Ledger> getEmployeesByVendor(@PathVariable Long vendorId) {
@@ -169,4 +173,6 @@ public class TimeSheetController {
 
         return employees;
     }
+
+
 }
