@@ -16,6 +16,7 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -1293,90 +1294,10 @@ public class MainController {
     }
 
 
-    @GetMapping("/timesheet/edit/{timesheetId}")
-    public String showEditTimesheetForm(Model model, @PathVariable Long timesheetId) {
-
-        //ledgers ids for all employees
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("Y", "Expense", "employee");
-        model.addAttribute("employees", clients.get());
-
-        Optional<TimeSheet> optTmesheet = timesheetRepository.findById(timesheetId);
-
-        if (optTmesheet.isPresent()) {
-            model.addAttribute("timesheet", optTmesheet.get());
-        } else {
-            return "timesheet-list?success=NoRecords" ;
-        }
-
-       // model.addAttribute("timesheet",new TimeSheet());
-
-        return "timesheet-add";
-    }
-
-    @GetMapping("/timesheet/add")
-    public String showAddTimesheetForm(Model model) {
-
-        //ledgers ids for all employees
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("Y", "Expense", "employee");
-        model.addAttribute("employees", clients.get());
-
-
-        model.addAttribute("timesheet",new TimeSheet());
-
-        return "timesheet-add";
-    }
 
 
 
-    @PostMapping("/timesheet/add")
-    public String saveTimesheet(@ModelAttribute TimeSheet timeSheet) {
 
 
-// ✅ Validate date order
-        if (timeSheet.getStartDate().isAfter(timeSheet.getEndDate())) {
-            return "redirect:/api/v1/timesheet/list?error=Invalid date range";
-        }
-
-        List<TimeSheet> collisions =
-                timesheetRepository.findCollidingTimeSheets(
-                        timeSheet.getEmployee(),
-                        timeSheet.getStartDate(),
-                        timeSheet.getEndDate(),
-                        timeSheet.getId()
-                );
-
-        if (!collisions.isEmpty()) {
-            return "redirect:/api/v1/timesheet/list?error=Timesheet date range overlaps with existing entry";
-        }
-
-        Optional<TimeSheet> t = null;
-        if (timeSheet.getId() != null) {
-            t = timesheetRepository.findById(timeSheet.getId());
-        }
-        if (timeSheet.getId() != null && t!=null && t.isPresent()) {
-            if (t.get().getInvoiceDetail() !=null) {
-                return "redirect:/api/v1/timesheet/list?error=hrs are already invoiced";
-            }
-            t.get().setEmployee(timeSheet.getEmployee());
-            t.get().setEndDate(timeSheet.getEndDate());
-            t.get().setStartDate(timeSheet.getStartDate());
-            t.get().setNoOfHrs(timeSheet.getNoOfHrs());
-            timesheetRepository.save(t.get());
-            return "redirect:/api/v1/timesheet/list?success="+ t.get().getEmployee().getLedgerName() + ":"
-                    +t.get().getStartDate() + ":" + t.get().getEndDate();
-        } else {
-            timesheetRepository.save(timeSheet);
-            return "redirect:/api/v1/timesheet/list?success="+ timeSheet.getEmployee().getLedgerName() + ":"
-                    +timeSheet.getStartDate() + ":" + timeSheet.getEndDate();
-        }
-    }
-
-    @GetMapping("/timesheet/list")
-    public String listTimeSheet(Model model) {
-        List<TimeSheet> dd = timesheetRepository.findAll();
-        dd.sort(Comparator.comparing(TimeSheet::getStartDate).reversed());
-        model.addAttribute("timeSheetList", dd);
-        return "timesheet-list";
-    }
 
 }

@@ -84,6 +84,7 @@
 				----
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/list}">View Timesheets</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/filter}">View Timesheets Filter</a></li>
 				</ul>
 
 

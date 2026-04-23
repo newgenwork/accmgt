@@ -28,6 +28,22 @@ public interface TimesheetRepository extends JpaRepository<TimeSheet, Long> {
             @Param("endDate") LocalDate endDate
     );
 
+
+
+    @Query(
+            "SELECT t FROM TimeSheet t " +
+                    "WHERE (COALESCE(:ledgerName, t.employee.ledgerName) = t.employee.ledgerName) " +
+                    "AND t.startDate >= :startDate " +
+                    "AND t.endDate   <= :endDate"
+    )
+    List<TimeSheet> findWithFilters(
+            @Param("ledgerName") String ledgerName,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+
+
     @Query(
             "SELECT t FROM TimeSheet t " +
                     "WHERE t.employee = :employee " +
