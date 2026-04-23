@@ -77,7 +77,7 @@ public class JournalController {
         model.addAttribute("journal", journal);
         model.addAttribute(
                 "clients",
-                ledgerRepository.findByTypeAndIsJournalEntryPossible("Expense", "Y")
+                ledgerRepository.findByTypeAndIsJournalEntryPossible("Expense", "Y").get()
         );
 
         return "journal-add";
