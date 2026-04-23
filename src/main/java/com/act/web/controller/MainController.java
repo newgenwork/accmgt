@@ -47,6 +47,8 @@ public class MainController {
     private final TrasactionRepository trasactionRepository;
     private final UserRepository userRepository;
     private final TimesheetRepository timesheetRepository;
+    @Autowired
+    private TransactionUtil transactionUtil;
 
     @Autowired
     private  SequenceRepository sequenceRepository;
@@ -76,51 +78,7 @@ public class MainController {
     }
 
 
-    void updateBalanceandTransaction(BigDecimal totalAmount,
-                                     InvoiceMaster invoiceMaster,
-                                     InvoiceDetail invoiceDetail,
-                                     JournalEntry journalEntry,
-                                     String from,
-                                     String to,
-                                     String desc,
-                                     LocalDate transactionDate,
-                                     boolean skipdeleteTransactions) {
-        if (!skipdeleteTransactions) {
-            Optional<List<Transaction>> retJeList = null;
-            if (invoiceMaster != null && invoiceMaster.getId() != null) {
-                retJeList = trasactionRepository.findByInvoiceMaster(invoiceMaster);
-            }
-            if (journalEntry != null) {
-                retJeList = trasactionRepository.findByJournalEntry(journalEntry);
-            }
 
-            if (retJeList != null && retJeList.isPresent()) {
-                Iterator<Transaction> ita = retJeList.get().iterator();
-                while (ita.hasNext()) {
-                    trasactionRepository.deleteById(ita.next().getId());
-                }
-            }
-        }
-        Transaction transaction = new Transaction();
-        transaction.setAccount(ledgerRepository.findByLedgerName(from).get());
-        transaction.setAmount(totalAmount.multiply(new BigDecimal(-1)));
-        transaction.setDescription(desc + " : flow : "+ from + " ==> " + to);
-        transaction.setTransactionDate(transactionDate);
-        transaction.setInvoiceMaster(invoiceMaster);
-        transaction.setJournalEntry(journalEntry);
-        transaction.setInvoiceDetail(invoiceDetail);
-        trasactionRepository.save(transaction);
-
-        Transaction transactionNew = new Transaction();
-        transactionNew.setAccount(ledgerRepository.findByLedgerName(to).get());
-        transactionNew.setAmount(totalAmount);
-        transactionNew.setDescription(desc + " : flow : "+ from + " ==> " + to);
-        transactionNew.setTransactionDate(transactionDate);
-        transactionNew.setInvoiceMaster(invoiceMaster);
-        transactionNew.setJournalEntry(journalEntry);
-        transaction.setInvoiceDetail(invoiceDetail);
-        trasactionRepository.save(transactionNew);
-    }
 
     Event getConfigEvent(Ledger ledger, String type) {
         Gson gson = new GsonBuilder()
@@ -824,7 +782,7 @@ public class MainController {
                                     .filter(Objects::nonNull)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                    updateBalanceandTransaction(
+                    transactionUtil.updateBalanceandTransaction(
                             totalAmount,
                             invoiceMasterEdit,
                             null,
@@ -855,7 +813,7 @@ public class MainController {
                                     .filter(Objects::nonNull)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                    updateBalanceandTransaction(totalAmount,
+                    transactionUtil.updateBalanceandTransaction(totalAmount,
                             invoiceMasterEdit,
                             null,
                             null,
@@ -895,7 +853,7 @@ public class MainController {
 
                             if (amt != null && amt.compareTo(BigDecimal.ZERO) != 0) {
                                 // amt is NOT zero
-                                updateBalanceandTransaction(amt,
+                                transactionUtil.updateBalanceandTransaction(amt,
                                         invoiceMasterEdit,
                                         invd,
                                         null,
@@ -982,114 +940,11 @@ public class MainController {
         model.addAttribute("invoiceMasterList", retList);
         return "invoicesMaster-List";
     }
-
-
-    @GetMapping("/journal/edit/{id}")
-    public String showEditjournalForm(Model model, @PathVariable String id) {
-        Optional<JournalEntry> t = journalEntryRepository.findById(id);
-        model.addAttribute("journal", t.get());
-        Optional<List<Ledger>> clients = ledgerRepository.findByType("Expense");
-        model.addAttribute("clients", clients.get());
-        return "journal-add";
-    }
-
-
     //journal
     @GetMapping("/guide")
     public String showGuide(Model model) {
-
-
         return "guide";
     }
-    //journal
-    @GetMapping("/journal/add")
-    public String showAddJournalForm(Model model) {
-        JournalEntry je = new JournalEntry();
-       // je.setId(UUID.randomUUID().toString());
-        je.setId("JN-" + sequenceRepository.getNextInvoiceSequence().toString());
-        model.addAttribute("journal", je);
-        Optional<List<Ledger>> clients = ledgerRepository.findByTypeAndIsJournalEntryPossible("Expense", "Y");
-        model.addAttribute("clients", clients.get());
-
-
-        return "journal-add";
-    }
-
-
-
-
-    // Handle submit
-    @Transactional
-    @PostMapping("/journal/add")
-    public String saveJournal(@ModelAttribute JournalEntry journalEntry) {
-        //from
-        //Optional<Ledger> client = ledgerRepository.f
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .setPrettyPrinting()
-                .create();
-
-        Config config = gson.fromJson(journalEntry.getTargetAccount().getConfig(), Config.class);
-
-        Iterator<Event> it = config.getEvents().iterator();
-
-        Event toApply = getConfigEvent(journalEntry.getTargetAccount(), journalEntry.getType());
-        if (toApply == null){
-            throw new RuntimeException("No Event Found. Please configure the ledger config event for  Event /"
-                    + journalEntry.getTargetAccount().getLedgerName() + " / " + journalEntry.getType());
-        }
-        if (toApply != null) {
-            Iterator<EventAction> itAction = toApply.getEventConfig().getEventAction().iterator();
-            while (itAction.hasNext()) {
-                EventAction ea = itAction.next();
-
-                JournalEntry je = null;
-                Optional<JournalEntry> optJe = journalEntryRepository.findById(journalEntry.getId());
-                if (optJe.isPresent()) {
-                    je = optJe.get();
-                } else {
-                    je = new JournalEntry();
-                }
-                je.setId(journalEntry.getId());
-
-                je.setTransactionDate(journalEntry.getTransactionDate());
-                if (ea.getType().equals("source")) {
-                    je.setAmount(journalEntry.getAmount());
-                }
-                je.setTargetAccount(journalEntry.getTargetAccount());
-
-                je.setType(journalEntry.getType());
-                je.setDescription(journalEntry.getDescription());
-
-                journalEntryRepository.save(je);
-
-
-                updateBalanceandTransaction(je.getAmount(), null, null,
-                        je,
-                        ea.getFromLedgerName(),
-                        ea.getToLedgerName(),
-                        je.getDescription() + " : "
-                                + ea.getFromLedgerName() + " : "
-                                + ea.getToLedgerName() + ":"
-                                + je.getTargetAccount().getLedgerName(),
-                        je.getTransactionDate(),
-                        false);
-
-            }
-        }
-        //journalEntryRepository.save(journalEntry);
-        return "redirect:/api/v1/journal/list?success=" +journalEntry.getId();
-    }
-
-
-    @GetMapping("/journal/list")
-    public String listJournalList(Model model) {
-        List<JournalEntry> dd = journalEntryRepository.findAll();
-        dd.sort(Comparator.comparing(JournalEntry::getTransactionDate).reversed());
-        model.addAttribute("journalList", dd);
-        return "journal-List";
-    }
-
 
     @GetMapping("/user/changeProfile")
     public String showChangeProfileForm(Model model) {
