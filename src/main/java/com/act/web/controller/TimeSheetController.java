@@ -113,13 +113,15 @@ public class TimeSheetController {
 
     @GetMapping("/list")
     public String listTimeSheet(
-            @RequestParam(required = false) String clientId,
-            @RequestParam(required = false) String employeeId,
+            @RequestParam(required = false) Long clientId,
+            @RequestParam(required = false) Long employeeId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             Model model) {
+
+
 
         LocalDate safeStart = startDate != null
                 ? startDate
@@ -131,7 +133,7 @@ public class TimeSheetController {
 
         List<TimeSheet> timeSheets =
                 timesheetRepository.findWithFilters(
-                        employeeId, safeStart, safeEnd);
+                        employeeId, clientId , safeStart, safeEnd);
 
         timeSheets.sort(
                 Comparator.comparing(TimeSheet::getStartDate).reversed());

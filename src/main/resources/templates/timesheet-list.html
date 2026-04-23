@@ -71,8 +71,10 @@
             </td>
             <td th:text="${ts.employee.ledgerName}"></td>
 
-            <td th:text="${ts.startDate}"></td>
-            <td th:text="${ts.endDate}"></td>
+
+            <td th:text="${#temporals.format(ts.startDate, 'MM-dd-yyyy')}"></td>
+
+            <td th:text="${#temporals.format(ts.endDate, 'MM-dd-yyyy')}"></td>
 
             <td th:text="${ts.noOfHrs}"></td>
             <td th:text="${ts.invoiceDetail?.invoiceMaster?.reference }"></td>

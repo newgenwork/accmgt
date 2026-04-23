@@ -57,7 +57,8 @@
                         </a>
 
                     </td>
-                    <td th:text="${journal.getTransactionDate()}"></td>
+                    <td th:text="${#temporals.format(journal.getTransactionDate(), 'MM-dd-yyyy')}"></td>
+
                     <td th:text="${journal.getTargetAccount().getLedgerName()}"></td>
                     <td th:text="${journal.getDescription()}"></td>
                     <td th:text="${journal.getAmount()}"></td>

@@ -90,8 +90,10 @@
                     <td th:text="${ledger.type}"></td>
                     <td th:text="${ledger.label}"></td>
                     <td th:text="${ledger.invoiceRate}"></td>
-                    <td th:text="${ledger.invoiceRateValidateFromDate}"></td>
-                    <td th:text="${ledger.invoiceRateValidateToDate}"></td>
+                    <td th:text="${#temporals.format(ledger.invoiceRateValidateFromDate, 'MM-dd-yyyy')}"></td>
+
+                    <td th:text="${#temporals.format(ledger.invoiceRateValidateToDate, 'MM-dd-yyyy')}"></td>
+
                     <td th:text="${ledger.invoiceCreationType}"></td>
                     <td>
 
