@@ -268,7 +268,7 @@
                 Submit Invoice
             </button>
 
-            <a th:href="'/api/v1/invoice/' + ${invoiceMaster.reference} + '/pdf'"
+            <a th:href="'/api/v1/invoicesMaster/invoice/' + ${invoiceMaster.reference} + '/pdf'"
                target="_blank"
                class="btn btn-secondary ml-2">
                 🖨 Print PDF
@@ -283,7 +283,7 @@
                     class="btn btn-warning">
                 Received Payment
             </button>
-            <a th:href="'/api/v1/invoice/' + ${invoiceMaster.reference} + '/pdf'"
+            <a th:href="'/api/v1/invoicesMaster/invoice/' + ${invoiceMaster.reference} + '/pdf'"
                target="_blank"
                class="btn btn-secondary ml-2">
                 🖨 Print PDF
