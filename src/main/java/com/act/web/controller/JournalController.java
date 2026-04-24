@@ -159,7 +159,7 @@ public class JournalController {
         );
 
         model.addAttribute("journalList", journals);
-        return "journal-list";
+        return "journal-List";
     }
 
     /* ================= HELPERS ================= */
