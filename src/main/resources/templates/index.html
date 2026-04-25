@@ -54,6 +54,11 @@
 				</ul>
 
 				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=wellsfargo&viewName=ledger-List-withonly-id-Name}">View Ledger (Employees for end client Wellsfargo with limited columns)</a></li>
+				</ul>
+
+
+				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&endClient=omron}">View Ledger (Employees for end client Omron)</a></li>
 				</ul>
 

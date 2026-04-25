@@ -155,6 +155,7 @@ public class LedgerController {
             @RequestParam(name = "label", required = false) String label,
             @RequestParam(name = "endClient", required = false) String endClient,
             @RequestParam(name = "invoiceLedger", required = false) String invoiceLedger,
+            @RequestParam(name = "viewName", required = false, defaultValue = "ledger-List") String viewName,
             Model model) {
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -242,7 +243,7 @@ public class LedgerController {
         model.addAttribute("ledgerTotalAmount", ledgerTotalAmount);
 
 
-        return "ledger-List";
+        return viewName;
     }
 
 

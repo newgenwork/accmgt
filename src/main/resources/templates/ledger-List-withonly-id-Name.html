@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div th:replace="fragments/header :: header"></div>
+
+
+    </div>
+</nav>
+
+
+
+
+<div >
+    <div >
+        <div >
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    You have successfully finished your transaction! ==>
+                    <span th:text="${param.success}"></span>
+                </div>
+            </div>
+
+
+            <h1>
+                View Ledger
+
+            </h1>
+
+
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+
+                    <th>Ledger Name</th>
+                    <th>isEmployee</th>
+                    <th>isJe</th>
+
+                    <th>Enable</th>
+
+
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="ledger : ${ledgers}">
+                    <td>
+
+                    <a th:href="@{/api/v1/ledger/edit/{id}(id=${ledger.getId()})}"/>
+
+                    <span th:text="${ledger.getId()}"></span>
+                    </a>
+                    </td>
+
+
+
+                      <td th:text="${ledger.ledgerName}"></td>
+                    <td th:text="${ledger.isEmployee}"></td>
+
+                    <td th:text="${ledger.isJournalEntryPossible}"></td>
+
+                    <td th:text="${ledger.enable}"></td>
+
+                </tr>
+                </tbody>
+            </table>
+            <br/>
+        </div>
+    </div>
+</div>
+
+<h1>
+    <span > Total Employees/Contractor : </span>
+    <span class="badge badge-primary ml-2"
+          th:text="${totalCount}">
+    </span>
+
+</h1>
+
+
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+    <tr>
+        <th>Ledger Name</th>
+        <th>Hourly Rate</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${ledgerTotals}">
+        <td th:text="${entry.key}"></td>
+        <td th:text="${entry.value}"></td>
+    </tr>
+    </tbody>
+</table>
+<h1>
+    <span > Hourly Rate (Revenue) : </span>
+    <span class="badge badge-primary ml-2"
+          th:text="${ledgerTotalAmount}">
+    </span>
+
+</h1>
+
+</body>
+</html>
+
