@@ -134,6 +134,7 @@ public class LedgerController {
             t.get().setInvoiceCreationType(ledger.getInvoiceCreationType());
             t.get().setIsJournalEntryPossible(ledger.getIsJournalEntryPossible());
             t.get().setEndClientName(ledger.getEndClientName());
+            t.get().setNotes(ledger.getNotes());
             ledgerRepository.save(t.get());
             return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 
@@ -144,8 +145,6 @@ public class LedgerController {
             return "redirect:/api/v1/ledger/list?success="+ledger.getLedgerName();
 
         }
-        //return "redirect:/employees";  // redirect to list page
-//return "redirect:/api/v1/ledger/list?success";
 
 
     }
@@ -205,7 +204,7 @@ public class LedgerController {
             dto.setLedgerName(led.getLedgerName());
             dto.setIsEmployee(led.getIsEmployee());
             dto.setEnable(led.getEnable());
-
+            dto.setNotes(led.getNotes());
             dto.setLabel(led.getLabel());
             dto.setCompanyName(led.getCompanyName());
             dto.setCompanyAddress(led.getCompanyAddress());

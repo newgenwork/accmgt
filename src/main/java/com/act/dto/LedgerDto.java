@@ -43,7 +43,15 @@ public class LedgerDto {
     private String missingTimsheet;
 
     private String endClientName ;
+    private String notes ;
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     public Long getId() {
         return id;
