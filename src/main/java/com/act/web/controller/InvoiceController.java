@@ -548,7 +548,7 @@ public class InvoiceController {
         List<InvoiceMasterDto> retList = new ArrayList<InvoiceMasterDto>();
 
         Iterator<InvoiceMaster> it = dd.iterator();
-
+        BigDecimal grandTotalAmount = BigDecimal.ZERO;
         while (it.hasNext()) {
             InvoiceMaster item = it.next();
             InvoiceMasterDto dto = new InvoiceMasterDto();
@@ -565,7 +565,7 @@ public class InvoiceController {
                             .map(InvoiceDetail::getAmount)
                             .filter(Objects::nonNull)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
-
+            grandTotalAmount = grandTotalAmount.add(totalAmount);
             dto.setAmount(totalAmount);
             Iterator<InvoiceDetail> ita = item.getDetails().iterator();
             while (ita.hasNext()) {
@@ -586,6 +586,8 @@ public class InvoiceController {
 
 
         model.addAttribute("invoiceMasterList", retList);
+
+        model.addAttribute("grandTotalAmount", grandTotalAmount);
         return "invoicesMaster-List";
     }
     //journal
