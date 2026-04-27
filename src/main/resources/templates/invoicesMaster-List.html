@@ -59,9 +59,10 @@
 
                     </td>
 
-                    <td th:text="${inv.invoiceDate}"></td>
+                        <td th:text="${#temporals.format(inv.invoiceDate, 'MM-dd-yyyy')}"></td>
+
                     <td th:text="${inv.status}"></td>
-                    <td class="text-right" th:text="${inv.amount}"></td>
+                    <td class="text-right" th:text="'$' + ${#numbers.formatDecimal(inv.amount, 1, 'COMMA', 2, 'POINT')}"></td>
                     <td th:text="${inv.client?.ledgerName}"></td>
                     <td th:text="${inv.notes}"></td>
                 </tr>

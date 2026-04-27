@@ -108,7 +108,14 @@
                             <a th:href="@{/api/v1/ledger/list(label='employee',invoiceLedger=${ledger.ledgerName})}">
                                Show Employees
                             </a>
+
+
                         </div>
+
+                       <div>
+                           <br>
+                        <a th:href="@{/api/v1/ledger/{id}/important-dates(id=${ledger.id})}"> Show Important Dates</a>
+                       </div>
 
                         <!--div th:if="*{ledger.label == 'AR' and ledger.type == 'Asset'}">
                             <a th:href="@{/api/v1/invoicesMaster/add/{id}(id=${ledger.getId()})}"/>

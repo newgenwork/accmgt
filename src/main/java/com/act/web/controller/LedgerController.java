@@ -9,8 +9,10 @@ import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
 import com.act.model.Ledger;
+import com.act.model.LedgerImportantDate;
 import com.act.model.TimeSheet;
 import com.act.model.Transaction;
+import com.act.repo.LedgerImportantDateRepository;
 import com.act.repo.LedgerRepository;
 import com.act.repo.TimesheetRepository;
 import com.act.repo.TrasactionRepository;
@@ -36,15 +38,20 @@ public class LedgerController {
     private final TrasactionRepository trasactionRepository;
     private final TimesheetRepository timesheetRepository;
 
+    private final LedgerImportantDateRepository importantDateRepository;
+
     public LedgerController(
             LedgerRepository ledgerRepository,
             TrasactionRepository trasactionRepository,
-            TimesheetRepository timesheetRepository
+            TimesheetRepository timesheetRepository, LedgerImportantDateRepository importantDateRepository
     ) {
         this.ledgerRepository = ledgerRepository;
         this.trasactionRepository = trasactionRepository;
         this.timesheetRepository = timesheetRepository;
+        this.importantDateRepository = importantDateRepository;
     }
+
+
     @GetMapping("/edit/{id}")
     public String showEditLedgerForm(Model model, @PathVariable long id) {
 
@@ -355,6 +362,52 @@ public class LedgerController {
         return missingRanges;
     }
 
+
+    /* ================= LIST ================= */
+
+    @GetMapping("/{ledgerId}/important-dates")
+    public String showImportantDates(
+            @PathVariable Long ledgerId,
+            Model model) {
+
+        Ledger ledger = ledgerRepository.findById(ledgerId).orElseThrow();
+
+        model.addAttribute("ledger", ledger);
+        model.addAttribute(
+                "importantDates",
+                importantDateRepository.findByLedgerOrderByImportantDateAsc(ledger)
+        );
+        model.addAttribute("newDate", new LedgerImportantDate());
+
+        return "ledger-important-dates";
+    }
+
+    /* ================= ADD ================= */
+
+    @PostMapping("/{ledgerId}/important-dates/add")
+    public String addImportantDate(
+            @PathVariable Long ledgerId,
+            @ModelAttribute LedgerImportantDate newDate) {
+
+        Ledger ledger = ledgerRepository.findById(ledgerId).orElseThrow();
+        newDate.setLedger(ledger);
+
+        importantDateRepository.save(newDate);
+
+        return "redirect:/api/v1/ledger/" + ledgerId + "/important-dates";
+    }
+
+    /* ================= DELETE ================= */
+
+    @PostMapping("/{ledgerId}/important-dates/delete/{dateId}")
+    public String deleteImportantDate(
+            @PathVariable Long ledgerId,
+            @PathVariable Long dateId) {
+
+        importantDateRepository.deleteById(dateId);
+
+        return "redirect:/api/v1/ledger/" + ledgerId + "/important-dates";
+    }
 
 
 }
