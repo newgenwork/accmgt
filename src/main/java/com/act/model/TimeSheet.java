@@ -19,11 +19,11 @@ public class TimeSheet {
     Ledger employee;
 
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "MM-dd-yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "MM-dd-yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     @Column(nullable = false, precision = 10, scale = 2)
