@@ -9,10 +9,11 @@ import com.act.json.model.Event;
 import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
 import com.act.model.Ledger;
-import com.act.model.LedgerImportantDate;
+import com.act.model.LedgerDocument;
 import com.act.model.TimeSheet;
 import com.act.model.Transaction;
-import com.act.repo.LedgerImportantDateRepository;
+import com.act.repo.LedgerDocumentRepository;
+import com.act.repo.LedgerDocumentRepository;
 import com.act.repo.LedgerRepository;
 import com.act.repo.TimesheetRepository;
 import com.act.repo.TrasactionRepository;
@@ -38,17 +39,17 @@ public class LedgerController {
     private final TrasactionRepository trasactionRepository;
     private final TimesheetRepository timesheetRepository;
 
-    private final LedgerImportantDateRepository importantDateRepository;
+    private final LedgerDocumentRepository ledgerDocumentRepository;
 
     public LedgerController(
             LedgerRepository ledgerRepository,
             TrasactionRepository trasactionRepository,
-            TimesheetRepository timesheetRepository, LedgerImportantDateRepository importantDateRepository
+            TimesheetRepository timesheetRepository, LedgerDocumentRepository ledgerDocumentRepository
     ) {
         this.ledgerRepository = ledgerRepository;
         this.trasactionRepository = trasactionRepository;
         this.timesheetRepository = timesheetRepository;
-        this.importantDateRepository = importantDateRepository;
+        this.ledgerDocumentRepository = ledgerDocumentRepository;
     }
 
 
@@ -365,7 +366,8 @@ public class LedgerController {
 
     /* ================= LIST ================= */
 
-    @GetMapping("/{ledgerId}/important-dates")
+
+    @GetMapping("/{ledgerId}/documents")
     public String showImportantDates(
             @PathVariable Long ledgerId,
             Model model) {
@@ -374,39 +376,41 @@ public class LedgerController {
 
         model.addAttribute("ledger", ledger);
         model.addAttribute(
-                "importantDates",
-                importantDateRepository.findByLedgerOrderByImportantDateAsc(ledger)
+                "ledgerDocuments",
+                ledgerDocumentRepository.findByLedgerOrderByExpiryDateAsc(ledger)
         );
-        model.addAttribute("newDate", new LedgerImportantDate());
 
-        return "ledger-important-dates";
+        model.addAttribute("ledgerDocument", new LedgerDocument());
+
+        return "ledger-documents";
     }
+
 
     /* ================= ADD ================= */
 
-    @PostMapping("/{ledgerId}/important-dates/add")
+    @PostMapping("/{ledgerId}/documents/add")
     public String addImportantDate(
             @PathVariable Long ledgerId,
-            @ModelAttribute LedgerImportantDate newDate) {
+            @ModelAttribute LedgerDocument newDate) {
 
         Ledger ledger = ledgerRepository.findById(ledgerId).orElseThrow();
         newDate.setLedger(ledger);
 
-        importantDateRepository.save(newDate);
+        ledgerDocumentRepository.save(newDate);
 
-        return "redirect:/api/v1/ledger/" + ledgerId + "/important-dates";
+        return "redirect:/api/v1/ledger/" + ledgerId + "/documents";
     }
 
     /* ================= DELETE ================= */
 
-    @PostMapping("/{ledgerId}/important-dates/delete/{dateId}")
+    @PostMapping("/{ledgerId}/documents/delete/{dateId}")
     public String deleteImportantDate(
             @PathVariable Long ledgerId,
             @PathVariable Long dateId) {
 
-        importantDateRepository.deleteById(dateId);
+        ledgerDocumentRepository.deleteById(dateId);
 
-        return "redirect:/api/v1/ledger/" + ledgerId + "/important-dates";
+        return "redirect:/api/v1/ledger/" + ledgerId + "/documents";
     }
 
 

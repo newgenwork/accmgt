@@ -2,12 +2,11 @@ package com.act.model;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "ledger_important_date")
-public class LedgerImportantDate {
+@Table(name = "ledger_documents_act")
+public class LedgerDocument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,13 +17,25 @@ public class LedgerImportantDate {
     private Ledger ledger;
 
     @Column(nullable = false)
-    private LocalDate importantDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate expiryDate;
+
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdDate;
+
 
     @Column(nullable = false, length = 255)
     private String description;
 
     @Column(length = 50)
     private String type; // OPTIONAL (e.g., CONTRACT, RENEWAL, COMPLIANCE)
+
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "document_content", nullable = false)
+    private byte[] documentContent;
 
     // getters & setters
 
@@ -45,12 +56,20 @@ public class LedgerImportantDate {
         this.ledger = ledger;
     }
 
-    public LocalDate getImportantDate() {
-        return importantDate;
+    public LocalDate getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setImportantDate(LocalDate importantDate) {
-        this.importantDate = importantDate;
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getDescription() {
@@ -67,5 +86,13 @@ public class LedgerImportantDate {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public byte[] getDocumentContent() {
+        return documentContent;
+    }
+
+    public void setDocumentContent(byte[] documentContent) {
+        this.documentContent = documentContent;
     }
 }
