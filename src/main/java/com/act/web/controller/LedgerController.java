@@ -29,6 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -123,7 +124,8 @@ public class LedgerController {
 
     // Handle submit
     @PostMapping("/add")
-    public String saveLedger(@ModelAttribute Ledger ledger) {
+    public String saveLedger(@ModelAttribute Ledger ledger,
+                             HttpSession session) {
 
         Optional<Ledger> t = null;
         if (ledger.getId() != null) {
@@ -149,19 +151,37 @@ public class LedgerController {
             t.get().setEndClientName(ledger.getEndClientName());
             t.get().setNotes(ledger.getNotes());
             ledgerRepository.save(t.get());
-            return "redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName();
 
+            return getRedirectURL("redirect:/api/v1/ledger/list?success=" + t.get().getLedgerName(), session);
         } else {
             ledger.setBalance(new BigDecimal(0));
             ledger.setBalanceUpdateDate(LocalDateTime.now());
             ledgerRepository.save(ledger);
-            return "redirect:/api/v1/ledger/list?success="+ledger.getLedgerName();
+            return getRedirectURL("redirect:/api/v1/ledger/list?success=" + ledger.getLedgerName(), session);
 
         }
 
 
     }
 
+    private String getRedirectURL(String baseUrl,  HttpSession session) {
+        HashMap<String, String> mapParams = (HashMap) session.getAttribute("lastLedgerQuery");
+
+        StringBuilder redirectUrl =
+                new StringBuilder(baseUrl);
+
+        if (mapParams!=null) {
+            for (Map.Entry<String, String> entry : mapParams.entrySet()) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                    redirectUrl.append("&")
+                            .append(entry.getKey())
+                            .append("=")
+                            .append(entry.getValue());
+                }
+            }
+        }
+        return redirectUrl.toString();
+    }
 
     @GetMapping("/list")
     public String listLedgers(
@@ -169,7 +189,16 @@ public class LedgerController {
             @RequestParam(name = "endClient", required = false) String endClient,
             @RequestParam(name = "invoiceLedger", required = false) String invoiceLedger,
             @RequestParam(name = "viewName", required = false, defaultValue = "ledger-List") String viewName,
-            Model model) {
+            HttpSession session,
+            Model model, Map map) {
+
+        Map<String, String > mapParams =new HashMap<>();
+        mapParams.put("label", label);
+        mapParams.put("endClient", endClient);
+        mapParams.put("invoiceLedger", invoiceLedger);
+        mapParams.put("viewName", viewName);
+        session.setAttribute("lastLedgerQuery", mapParams);
+
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
         List<Ledger> retList = ledgerRepository.findAll();
