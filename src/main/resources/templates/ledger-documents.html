@@ -21,7 +21,7 @@
 <nav class="navbar navbar-light bg-light">
     <div class="container">
         <h4 class="navbar-brand mb-0">
-            Important Dates – <span th:text="${ledger.ledgerName}"></span>
+            Documents – <span th:text="${ledger.ledgerName}"></span>
         </h4>
     </div>
 </nav>
@@ -34,81 +34,111 @@
             Add Important Date
         </div>
         <div class="card-body">
-            <form th:action="@{/api/v1/ledger/{id}/important-dates/add(id=${ledger.id})}" method="post">
-
-    <input type="hidden"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}" />
-
+            <form th:action="@{/api/v1/ledger/{id}/documents/add(id=${ledger.id})}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  th:value="${_csrf.token}" />
 
             <div class="form-row">
+
                 <div class="form-group col-md-3">
-                    <label>Date</label>
+                    <label>Expiry Date</label>
                     <input type="date"
                            class="form-control"
-                           name="importantDate"
-                           required>
+                           name="expiryDate"
+                           required />
                 </div>
 
-                <div class="form-group col-md-5">
+                <div class="form-group col-md-3">
                     <label>Description</label>
                     <input type="text"
                            class="form-control"
                            name="description"
-                           placeholder="e.g. Contract Expiry"
-                           required>
+                           required />
                 </div>
 
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-2">
                     <label>Type</label>
                     <input type="text"
                            class="form-control"
                            name="type"
-                           placeholder="CONTRACT / RENEWAL">
+                           placeholder="CONTRACT" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Upload File</label>
+                    <input type="file"
+                           class="form-control"
+                           name="file"
+                           required />
                 </div>
 
                 <div class="form-group col-md-1 d-flex align-items-end">
-                    <button class="btn btn-primary btn-block">
+                    <button type="submit" class="btn btn-primary btn-block">
                         Add
                     </button>
                 </div>
-            </div>
 
+            </div>
             </form>
         </div>
     </div>
 
     <!-- ================= LIST ================= -->
-    <table class="table table-bordered table-hover">
+
+
+
+
+    <table class="table table-bordered table-hover mt-4">
         <thead class="thead-light">
         <tr>
-            <th style="width: 120px;">Date</th>
+            <th>Created Date</th>
+
+            <th>Expiry Date</th>
             <th>Description</th>
-            <th style="width: 140px;">Type</th>
-            <th style="width: 100px;">Action</th>
+
+            <th>Type</th>
+            <th style="width: 220px;">Action</th>
         </tr>
         </thead>
 
         <tbody>
-        <tr th:each="d : ${importantDates}">
-            <td th:text="${d.importantDate}"></td>
+        <tr th:each="d : ${documents}">
+
+            <td th:text="${#temporals.format(d.createdDate, 'MM-dd-yyyy')}"></td>
+            <td th:text="${#temporals.format(d.expiryDate, 'MM-dd-yyyy')}"></td>
             <td th:text="${d.description}"></td>
             <td th:text="${d.type}"></td>
+
             <td class="text-center">
 
+                <!-- DOWNLOAD -->
 
-                <form th:action="@{/api/v1/ledger/{lId}/important-dates/delete/{dId}
-                  (lId=${ledger.id}, dId=${d.id})}"
-                      en (required if Spring Security is enabled) -->
-                    <input type="hidden"
-                           th:name="${_csrf.parameterName}"
-                           th:value="${_csrf.token}" />
+                <form th:action="@{/api/v1/ledger/documents/download/{id}(id=${d.id})}"
+                      method="GET"
+                      style="displaymeterName}"
+                      th:value="${_csrf.token}" />
 
-                    <button type="submit"
-                            class="btn btn-sm btn-danger"
-                            onclick="return confirm('Remove this important date?')">
-                        Remove
-                    </button>
+                <button type="submit"
+                        class="btn btn-sm btn-success">
+                    Download
+                </button>
+
+                </form>
+
+
+            <form th:action="@{/api/v1/ledger/{lId}/documents/delete/{dId} (lId=${ledger.id}, dId=${d.id})}" method="post">
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+
+
+                <button type="submit"
+                        class="btn btn-sm btn-danger"
+                        onclick="return confirm('Remove this important date?')">
+                    Remove
+                </button>
 
                 </form>
 
@@ -116,9 +146,9 @@
             </td>
         </tr>
 
-        <tr th:if="${#lists.isEmpty(importantDates)}">
+        <tr th:if="${#lists.isEmpty(documents)}">
             <td colspan="4" class="text-center text-muted">
-                No important dates configured.
+                No documents uploaded.
             </td>
         </tr>
 

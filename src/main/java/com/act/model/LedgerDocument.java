@@ -37,8 +37,31 @@ public class LedgerDocument {
     @Column(name = "document_content", nullable = false)
     private byte[] documentContent;
 
+
+    @Column(length = 255)
+    private String fileName;
+
+    @Column(length = 100)
+    private String contentType;
+
     // getters & setters
 
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
     public Long getId() {
         return id;

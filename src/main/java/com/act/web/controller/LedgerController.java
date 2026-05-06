@@ -20,9 +20,14 @@ import com.act.repo.TrasactionRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -366,9 +371,9 @@ public class LedgerController {
 
     /* ================= LIST ================= */
 
-
+    @Transactional
     @GetMapping("/{ledgerId}/documents")
-    public String showImportantDates(
+    public String showDocuments(
             @PathVariable Long ledgerId,
             Model model) {
 
@@ -376,11 +381,10 @@ public class LedgerController {
 
         model.addAttribute("ledger", ledger);
         model.addAttribute(
-                "ledgerDocuments",
+                "documents",
                 ledgerDocumentRepository.findByLedgerOrderByExpiryDateAsc(ledger)
         );
-
-        model.addAttribute("ledgerDocument", new LedgerDocument());
+        model.addAttribute("newDocument", new LedgerDocument());
 
         return "ledger-documents";
     }
@@ -388,30 +392,69 @@ public class LedgerController {
 
     /* ================= ADD ================= */
 
+
+    @Transactional
     @PostMapping("/{ledgerId}/documents/add")
-    public String addImportantDate(
+    public String addDocument(
             @PathVariable Long ledgerId,
-            @ModelAttribute LedgerDocument newDate) {
+            @RequestParam("file") MultipartFile file,
+            @ModelAttribute LedgerDocument newDocument) throws Exception {
 
         Ledger ledger = ledgerRepository.findById(ledgerId).orElseThrow();
-        newDate.setLedger(ledger);
 
-        ledgerDocumentRepository.save(newDate);
+
+        newDocument.setLedger(ledger);
+        newDocument.setCreatedDate(LocalDate.now());
+
+        // ✅ SAVE FILE CONTENT
+        newDocument.setDocumentContent(file.getBytes());
+
+        // ✅ SAVE ORIGINAL FILE NAME
+        newDocument.setFileName(file.getOriginalFilename());
+
+        // ✅ SAVE CONTENT TYPE
+        newDocument.setContentType(file.getContentType());
+
+
+        ledgerDocumentRepository.save(newDocument);
 
         return "redirect:/api/v1/ledger/" + ledgerId + "/documents";
     }
+
 
     /* ================= DELETE ================= */
 
-    @PostMapping("/{ledgerId}/documents/delete/{dateId}")
-    public String deleteImportantDate(
-            @PathVariable Long ledgerId,
-            @PathVariable Long dateId) {
 
-        ledgerDocumentRepository.deleteById(dateId);
+    @Transactional
+    @PostMapping("/{ledgerId}/documents/delete/{docId}")
+    public String deleteDocument(
+            @PathVariable Long ledgerId,
+            @PathVariable Long docId) {
+
+        ledgerDocumentRepository.deleteById(docId);
 
         return "redirect:/api/v1/ledger/" + ledgerId + "/documents";
     }
+
+
+
+    @Transactional
+    @GetMapping("/documents/download/{docId}")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long docId) {
+
+        LedgerDocument doc = ledgerDocumentRepository.findById(docId).orElseThrow();
+
+        return ResponseEntity.ok()
+                // ✅ USE ORIGINAL FILE NAME
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + doc.getFileName() + "\"")
+
+                // ✅ USE CORRECT MIME TYPE
+                .contentType(MediaType.parseMediaType(doc.getContentType()))
+
+                .body(doc.getDocumentContent());
+    }
+
 
 
 }
