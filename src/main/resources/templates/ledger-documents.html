@@ -113,34 +113,43 @@
             <td class="text-center">
 
                 <!-- DOWNLOAD -->
+                <table>
+                    <td>
+                        <form th:action="@{/api/v1/ledger/documents/download/{id}(id=${d.id})}"
+                              method="GET"
+                              style="displaymeterName}"
+                              th:value="${_csrf.token}" />
 
-                <form th:action="@{/api/v1/ledger/documents/download/{id}(id=${d.id})}"
-                      method="GET"
-                      style="displaymeterName}"
-                      th:value="${_csrf.token}" />
+                        <button type="submit"
+                                class="btn btn-sm btn-success">
+                            Download
+                        </button>
 
-                <button type="submit"
-                        class="btn btn-sm btn-success">
-                    Download
-                </button>
+                        </form>
+                    </td>
+                    <td>
 
-                </form>
-
-
-            <form th:action="@{/api/v1/ledger/{lId}/documents/delete/{dId} (lId=${ledger.id}, dId=${d.id})}" method="post">
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
+                        <form th:action="@{/api/v1/ledger/{lId}/documents/delete/{dId} (lId=${ledger.id}, dId=${d.id})}" method="post">
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
 
 
 
-                <button type="submit"
-                        class="btn btn-sm btn-danger"
-                        onclick="return confirm('Remove this important date?')">
-                    Remove
-                </button>
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Remove this important date?')">
+                                Remove
+                            </button>
 
-                </form>
+                        </form>
+
+                    </td>
+                </table>
+
+
+
+
 
 
             </td>
