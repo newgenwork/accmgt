@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Invoice List</title>
+</head>
+<body>
+
+<h2>Payable Invoice List</h2>
+
+<a th:href="@{/le-invoice/add}Add New</a>
+
+<table border="1">
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Vendor</th>
+  <th>Amount</th>
+  <th>Reference</th>
+  <th>Download</th>
+</tr>
+</thead>
+
+<tbody>
+<tr th:each="d : ${invoices}">
+
+  <td th:text="${d.id}"></td>
+
+  <td th:text="${d.vendor.ledgerName}"></td>
+
+  <td th:text="${d.amount}"></td>
+
+  <td th:text="${d.reference}"></td>
+
+  <td>
+    <a th:if="${d.documentContent != null}"
+       th:href="@{/api/v1/payable-invoice/download/{id      <span th:if="${d.documentContent == null}">
+    No File
+    </span>
+  </td>
+
+</tr>
+</tbody>
+
+</table>
+
+</body>
+</html>

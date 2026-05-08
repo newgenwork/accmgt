@@ -1,0 +1,76 @@
+package com.act.web.controller;
+
+import com.act.model.Ledger;
+import com.act.model.PayableInvoice;
+import com.act.repo.LedgerRepository;
+import com.act.repo.PayableInvoiceRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+
+@Controller
+@RequestMapping("/api/v1/payable-invoice")
+public class PayableInvoiceController {
+
+    private final PayableInvoiceRepository repo;
+    private final LedgerRepository ledgerRepository;
+
+    public PayableInvoiceController(
+            PayableInvoiceRepository repo,
+            LedgerRepository ledgerRepository) {
+        this.repo = repo;
+        this.ledgerRepository = ledgerRepository;
+    }
+
+    /* ================= LIST ================= */
+    @GetMapping("/list")
+    public String list(Model model) {
+        model.addAttribute("invoices", repo.findAll());
+        return "payable-invoice-list";
+    }
+
+    /* ================= SHOW ADD FORM ================= */
+    @GetMapping("/add")
+    public String showAdd(Model model) {
+        model.addAttribute("invoice", new PayableInvoice());
+        model.addAttribute("vendors",
+                ledgerRepository.findByIsEmployeeAndType("N", "Expense").get());
+        return "payable-invoice-add";
+    }
+
+    /* ================= SAVE ================= */
+    @PostMapping("/add")
+    public String add(
+            @ModelAttribute PayableInvoice invoice,
+            @RequestParam("file") MultipartFile file) throws Exception {
+
+        invoice.setInvoiceReceiveDate(LocalDate.now());
+
+        if (file != null && !file.isEmpty()) {
+            invoice.setDocumentContent(file.getBytes());
+            invoice.setFileName(file.getOriginalFilename());
+            invoice.setContentType(file.getContentType());
+        }
+
+        repo.save(invoice);
+
+        return "redirect:/api/v1/payable-invoice/list";
+    }
+
+    /* ================= DOWNLOAD ================= */
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> download(@PathVariable Long id) {
+
+        PayableInvoice doc = repo.findById(id).orElseThrow();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + doc.getFileName() + "\"")
+                .body(doc.getDocumentContent());
+    }
+}
