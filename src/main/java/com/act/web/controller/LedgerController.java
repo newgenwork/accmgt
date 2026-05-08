@@ -404,6 +404,7 @@ public class LedgerController {
     @GetMapping("/{ledgerId}/documents")
     public String showDocuments(
             @PathVariable Long ledgerId,
+            HttpSession session,
             Model model) {
 
         Ledger ledger = ledgerRepository.findById(ledgerId).orElseThrow();
@@ -414,6 +415,9 @@ public class LedgerController {
                 ledgerDocumentRepository.findByLedgerOrderByExpiryDateAsc(ledger)
         );
         model.addAttribute("newDocument", new LedgerDocument());
+        model.addAttribute("ledgerListEndpoint",getRedirectURL("/api/v1/ledger/list?success=" + ledger.getLedgerName(), session));
+
+
 
         return "ledger-documents";
     }
@@ -443,6 +447,7 @@ public class LedgerController {
 
         // ✅ SAVE CONTENT TYPE
         newDocument.setContentType(file.getContentType());
+
 
 
         ledgerDocumentRepository.save(newDocument);

@@ -57,6 +57,15 @@
                            required />
                 </div>
 
+                <div class="form-group col-md-3">
+                    <label>Document Link</label>
+                    <input type="text"
+                           class="form-control"
+                           name="documentLink"
+                            />
+                </div>
+
+
                 <div class="form-group col-md-2">
                     <label>Type</label>
                     <input type="text"
@@ -70,7 +79,7 @@
                     <input type="file"
                            class="form-control"
                            name="file"
-                           required />
+                            />
                 </div>
 
                 <div class="form-group col-md-1 d-flex align-items-end">
@@ -98,6 +107,7 @@
             <th>Description</th>
 
             <th>Type</th>
+            <th>Document Link</th>
             <th style="width: 220px;">Action</th>
         </tr>
         </thead>
@@ -108,22 +118,42 @@
             <td th:text="${#temporals.format(d.createdDate, 'MM-dd-yyyy')}"></td>
             <td th:text="${#temporals.format(d.expiryDate, 'MM-dd-yyyy')}"></td>
             <td th:text="${d.description}"></td>
+            <td th:text="${d.documentLink}"></td>
             <td th:text="${d.type}"></td>
 
             <td class="text-center">
 
                 <!-- DOWNLOAD -->
                 <table>
+                    <tr>
                     <td>
-                        <form th:action="@{/api/v1/ledger/documents/download/{id}(id=${d.id})}"
+
+
+
+
+                        <form th:if="${d.isHasFile()}"
+                              th:action="@{/api/v1/ledger/documents/download/{id}(id=${d.id})}"
                               method="GET"
                               style="displaymeterName}"
                               th:value="${_csrf.token}" />
 
-                        <button type="submit"
+                        <!--button type="submit"
                                 class="btn btn-sm btn-success">
                             Download
+                        </button-->
+
+
+                        <button type="submit"
+                                class="btn btn-sm"
+                                th:classappend="${d.hasFile} ? 'btn-success' : 'btn-secondary'"
+                                th:text="${d.hasFile} ? 'Download' : 'No File'"
+                                th:disabled="${!d.hasFile}">
                         </button>
+
+
+
+
+
 
                         </form>
                     </td>
@@ -145,6 +175,7 @@
                         </form>
 
                     </td>
+                    </tr>
                 </table>
 
 
@@ -163,7 +194,7 @@
 
         </tbody>
     </table>
-    <a href="/api/v1/ledger/list">Back to Ledger List</a>
+    <a th:href="${ledgerListEndpoint}">Back to Ledger List</a>
 
 </div>
 

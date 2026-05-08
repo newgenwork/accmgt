@@ -28,6 +28,10 @@ public class LedgerDocument {
     @Column(nullable = false, length = 255)
     private String description;
 
+    @Column(nullable = true, length = 255)
+    private String documentLink;
+
+
     @Column(length = 50)
     private String type; // OPTIONAL (e.g., CONTRACT, RENEWAL, COMPLIANCE)
 
@@ -38,6 +42,7 @@ public class LedgerDocument {
     private byte[] documentContent;
 
 
+
     @Column(length = 255)
     private String fileName;
 
@@ -45,6 +50,9 @@ public class LedgerDocument {
     private String contentType;
 
     // getters & setters
+    public boolean isHasFile() {
+        return documentContent != null && documentContent.length>0;
+    }
 
 
     public String getFileName() {
@@ -117,5 +125,13 @@ public class LedgerDocument {
 
     public void setDocumentContent(byte[] documentContent) {
         this.documentContent = documentContent;
+    }
+
+    public String getDocumentLink() {
+        return documentLink;
+    }
+
+    public void setDocumentLink(String documentLink) {
+        this.documentLink = documentLink;
     }
 }
