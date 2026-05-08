@@ -18,6 +18,6 @@ public interface LedgerRepository extends JpaRepository<Ledger, Long> {
     Optional<List<Ledger>> findByTypeAndIsJournalEntryPossible(String type, String isJournalEntryPossible);
 
     Optional<List<Ledger>> findByIsEmployeeAndTypeAndInvoiceLedger(String isEmployee, String type ,Ledger invoiceLedger);
-
+    List<Ledger> findAllByOrderByLedgerNameAsc();
 
 }

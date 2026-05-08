@@ -201,7 +201,7 @@ public class LedgerController {
 
         DateTimeFormatter dateFormatter =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        List<Ledger> retList = ledgerRepository.findAll();
+        List<Ledger> retList = ledgerRepository.findAllByOrderByLedgerNameAsc();
         List<LedgerDto> retListDto = new ArrayList<LedgerDto>();
         Iterator<Ledger> it = retList.iterator();
 
