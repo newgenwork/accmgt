@@ -6,6 +6,7 @@ import com.act.json.model.EventAction;
 import com.act.json.model.LocalDateAdapter;
 import com.act.model.JournalEntry;
 import com.act.model.Ledger;
+import com.act.model.PayableInvoice;
 import com.act.repo.JournalEntryRepository;
 import com.act.repo.LedgerRepository;
 import com.act.repo.SequenceRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -162,6 +164,18 @@ public class JournalController {
         return "journal-List";
     }
 
+    @GetMapping("/payslip/{id}/pdf")
+    public void downloadPayslip(
+            @PathVariable Long id,
+            HttpServletResponse response) throws Exception {
+
+    //    PayableInvoice invoice = repo.findById(id).orElseThrow();
+
+        response.setContentType("application/pdf");
+      //  response.setHeader("Content-Disposition",
+        //        "attachment; filename=payslip-" + invoice.getId() + ".pdf");
+    }
+
     /* ================= HELPERS ================= */
 
     private Event getConfigEvent(
@@ -184,6 +198,8 @@ public class JournalController {
         }
         return null;
     }
+
+
 
 
 }

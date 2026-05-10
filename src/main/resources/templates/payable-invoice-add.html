@@ -29,7 +29,9 @@
                 </div>
             </div>
 
-            <form th:action="@{/api/v1/timesheet/add}" method="post" th:object="${invoice}">
+            <form th:action="@{/api/v1/payable-invoice/add}" method="post" th:object="${invoice}"
+                  enctype="multipart/form-data"
+                  th:value="${_csrf.token}" >
 
                 <input type="hidden" th:field="*{id}" />
                 <div class="form-group">
@@ -49,6 +51,71 @@
                         </option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="invoiceReceiveDate">
+                        Receive Date
+                    </label>
+                    <input id="invoiceReceiveDate" type="date" class="form-control" th:field="*{invoiceReceiveDate}" required autofocus="autofocus">
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="description">
+                        Description
+                    </label>
+
+
+                    <input id="description"  class="form-control" th:field="*{description}"
+                           required autofocus="autofocus"/>
+
+
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+
+                    <input id="amount" type="number"
+                           step="0.01"
+                           min="0"
+                           placeholder="0.00"  class="form-control" th:field="*{amount}"
+                           required autofocus="autofocus"/>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="notes">
+                        Notes
+                    </label>
+
+
+                    <textarea  id="notes" class="form-control" th:field="*{notes}" required autofocus="autofocus" rows="4" cols="30"></textarea>
+
+
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="documentContent">
+                        Upload Invoice
+                    </label>
+
+
+                    <input  id="documentContent" type="file" name="file"/>
+
+                </div>
+
+
+                <!--
+                <div class="form-group">
+                    <label class="control-label" for="description">
+                        Description
+                    </label>
+
+
+                    <input id="description"  class="form-control" th:field="*{journal.description}"
+                           required autofocus="autofocus"/>
+
+                    <input type="hidden" th:field="*{journal.id}">
+
+                </div> -->
 
 
                 <div class="form-group">

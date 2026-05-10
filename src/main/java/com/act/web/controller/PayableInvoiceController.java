@@ -39,7 +39,7 @@ public class PayableInvoiceController {
     public String showAdd(Model model) {
         model.addAttribute("invoice", new PayableInvoice());
         model.addAttribute("vendors",
-                ledgerRepository.findByIsEmployeeAndType("N", "Expense").get());
+                ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
         return "payable-invoice-add";
     }
 
@@ -49,7 +49,7 @@ public class PayableInvoiceController {
             @ModelAttribute PayableInvoice invoice,
             @RequestParam("file") MultipartFile file) throws Exception {
 
-        invoice.setInvoiceReceiveDate(LocalDate.now());
+        //invoice.setInvoiceReceiveDate(LocalDate.now());
 
         if (file != null && !file.isEmpty()) {
             invoice.setDocumentContent(file.getBytes());
