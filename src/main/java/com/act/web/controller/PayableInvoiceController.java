@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/v1/payable-invoice")
@@ -19,12 +21,14 @@ public class PayableInvoiceController {
 
     private final PayableInvoiceRepository repo;
     private final LedgerRepository ledgerRepository;
+    private final PayableInvoiceRepository payableInvoiceRepository;
 
     public PayableInvoiceController(
             PayableInvoiceRepository repo,
-            LedgerRepository ledgerRepository) {
+            LedgerRepository ledgerRepository, PayableInvoiceRepository payableInvoiceRepository) {
         this.repo = repo;
         this.ledgerRepository = ledgerRepository;
+        this.payableInvoiceRepository = payableInvoiceRepository;
     }
 
     /* ================= LIST ================= */
@@ -40,6 +44,17 @@ public class PayableInvoiceController {
         PayableInvoice pi =  new PayableInvoice();
         pi.setStatus("SUBMITTED");
         model.addAttribute("invoice", pi);
+        model.addAttribute("vendors",
+                ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
+        return "payable-invoice-add";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditLedgerForm(Model model, @PathVariable long id) {
+
+        Optional<PayableInvoice> t = payableInvoiceRepository.findById(id);
+        model.addAttribute("invoice", t.get());
+
         model.addAttribute("vendors",
                 ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
         return "payable-invoice-add";

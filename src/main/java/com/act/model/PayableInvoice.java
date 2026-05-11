@@ -137,4 +137,9 @@ public class PayableInvoice {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public boolean hasFile() {
+        return documentContent != null && documentContent.length>0;
+    }
+
 }

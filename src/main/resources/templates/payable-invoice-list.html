@@ -48,8 +48,12 @@
                 <tbody>
                 <tr th:each="d : ${invoices}">
 
-                    <td th:text="${d.id}"></td>
+                    <td>
+                    <a th:href="@{/api/v1/payable-invoice/edit/{id}(id=${d.getId()})}"/>
 
+                    <span th:text="${d.getId()}"></span>
+                    </a>
+                    </td>
                     <td th:text="${d.vendor.ledgerName}"></td>
 
                     <td th:text="${d.amount}"></td>
