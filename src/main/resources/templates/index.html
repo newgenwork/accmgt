@@ -78,25 +78,23 @@
 				</ul>
 				----
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/list}">View Invoices Masters</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/invoicesMaster/list}">Manage Invoices Masters</a></li>
 				</ul>
 
 				----
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">View Journals</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Manage Journals</a></li>
 				</ul>
 
 				----
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/list}">View Timesheets</a></li>
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/filter}">View Timesheets Filter</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/list}">Manage Timesheets</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/timesheet/filter}">Manage Timesheets with Filter</a></li>
 				</ul>
 				----
 				<ul class="nav navbar-nav">
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/add}">Add Accounts Payable Invoice</a></li>
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/list}">View Accounts Payable Invoice</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/list}">Manage Accounts Payable Invoice</a></li>
 				</ul>
-
 
 
 			</div>

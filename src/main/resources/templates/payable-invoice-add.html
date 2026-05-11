@@ -5,6 +5,11 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script>
+        function setStatus(val) {
+        document.getElementById("status").value = val;
+    }
+    </script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -113,23 +118,10 @@
                     <input  id="documentContent" type="file" name="file"/>
 
                 </div>
-                <div class="form-group">
 
-
-
-                <button type="submit"
-                        class="btn btn-sm"
-                        th:classappend="${d.hasFile} ? 'btn-success' : 'btn-secondary'"
-                        th:text="${d.hasFile} ? 'Download' : 'No File'"
-                        th:disabled="${!d.hasFile}">
-                </button>
-
-
-
-        </div>
                 <div class="form-group">
                     <label class="control-label" for="status">
-                        Description
+                        Status
                     </label>
 
 
@@ -153,10 +145,22 @@
                 </div> -->
 
 
+
                 <div class="form-group">
                     <button type="submit" class="btn btn-success">Submit</button>
+
+                    <button type="submit"
+                            class="btn btn-danger ml-2"
+                            th:if="${invoice.status == 'SUBMITTED'}"
+                            onclick="setStatus('DECLINED')">
+                        Decline
+                    </button>
+
                 </div>
+
+
             </form>
+
         </div>
     </div>
 </div>

@@ -42,7 +42,7 @@ public class PayableInvoiceController {
     @GetMapping("/add")
     public String showAdd(Model model) {
         PayableInvoice pi =  new PayableInvoice();
-        pi.setStatus("SUBMITTED");
+        pi.setStatus("DRAFT");
         model.addAttribute("invoice", pi);
         model.addAttribute("vendors",
                 ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
@@ -66,13 +66,31 @@ public class PayableInvoiceController {
             @ModelAttribute PayableInvoice invoice,
             @RequestParam("file") MultipartFile file) throws Exception {
 
+        PayableInvoice existing = null;
+
+        if (invoice.getId() != null) {
+            existing = payableInvoiceRepository.findById(invoice.getId()).orElse(null);
+        }
+
+
         //invoice.setInvoiceReceiveDate(LocalDate.now());
-        invoice.setStatus("SUBMITTED");
+        if (invoice.getStatus().equals("DRAFT")) {
+            invoice.setStatus("SUBMITTED");
+        }
+
         if (file != null && !file.isEmpty()) {
             invoice.setDocumentContent(file.getBytes());
             invoice.setFileName(file.getOriginalFilename());
             invoice.setContentType(file.getContentType());
         }
+        else if (existing != null) {
+
+            // ✅ KEEP existing file
+            invoice.setDocumentContent(existing.getDocumentContent());
+            invoice.setFileName(existing.getFileName());
+            invoice.setContentType(existing.getContentType());
+        }
+
 
         repo.save(invoice);
 
