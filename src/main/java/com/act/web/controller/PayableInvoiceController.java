@@ -37,7 +37,9 @@ public class PayableInvoiceController {
     /* ================= SHOW ADD FORM ================= */
     @GetMapping("/add")
     public String showAdd(Model model) {
-        model.addAttribute("invoice", new PayableInvoice());
+        PayableInvoice pi =  new PayableInvoice();
+        pi.setStatus("SUBMITTED");
+        model.addAttribute("invoice", pi);
         model.addAttribute("vendors",
                 ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
         return "payable-invoice-add";
@@ -50,7 +52,7 @@ public class PayableInvoiceController {
             @RequestParam("file") MultipartFile file) throws Exception {
 
         //invoice.setInvoiceReceiveDate(LocalDate.now());
-
+        invoice.setStatus("SUBMITTED");
         if (file != null && !file.isEmpty()) {
             invoice.setDocumentContent(file.getBytes());
             invoice.setFileName(file.getOriginalFilename());

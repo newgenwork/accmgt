@@ -60,6 +60,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="control-label" for="reference">
+                        Reference
+                    </label>
+
+
+                    <input id="reference"  class="form-control" th:field="*{reference}"
+                           required autofocus="autofocus"/>
+
+
+                </div>
+
+                <div class="form-group">
                     <label class="control-label" for="description">
                         Description
                     </label>
@@ -102,7 +114,17 @@
 
                 </div>
 
+                <div class="form-group">
+                    <label class="control-label" for="status">
+                        Description
+                    </label>
 
+
+                    <input id="status"  class="form-control" th:field="*{status}"
+                           readonly autofocus="autofocus"/>
+
+
+                </div>
                 <!--
                 <div class="form-group">
                     <label class="control-label" for="description">

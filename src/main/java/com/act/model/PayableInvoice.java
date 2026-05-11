@@ -46,6 +46,10 @@ public class PayableInvoice {
     @Column(length = 100)
     private String contentType;
 
+
+    @Column(length = 100)
+    private String status; //SUBMITTED or PAID or DECLINED
+
     public String getFileName() {
         return fileName;
     }
@@ -124,5 +128,13 @@ public class PayableInvoice {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -1,47 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Invoice List</title>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div th:replace="fragments/header :: header"></div>
 
-<h2>Payable Invoice List</h2>
 
-<a th:href="@{/le-invoice/add}Add New</a>
+    </div>
+</nav>
 
-<table border="1">
-<thead>
-<tr>
-  <th>ID</th>
-  <th>Vendor</th>
-  <th>Amount</th>
-  <th>Reference</th>
-  <th>Download</th>
-</tr>
-</thead>
 
-<tbody>
-<tr th:each="d : ${invoices}">
+<div>
+    <div>
+        <div>
 
-  <td th:text="${d.id}"></td>
+            <h1>View Payable Invoices</h1>
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    You have successfully finished your transaction! ==>
+                    <span th:text="${param.success}"></span>
+                </div>
+            </div>
 
-  <td th:text="${d.vendor.ledgerName}"></td>
+            <ul class="nav navbar-nav">
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/add}">Add Payable Invoice
+                </a></li>
+            </ul>
 
-  <td th:text="${d.amount}"></td>
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Vendor</th>
+                    <th>Amount</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Download</th>
+                </tr>
+                </thead>
 
-  <td th:text="${d.reference}"></td>
+                <tbody>
+                <tr th:each="d : ${invoices}">
 
-  <td>
-    <a th:if="${d.documentContent != null}"
-       th:href="@{/api/v1/payable-invoice/download/{id      <span th:if="${d.documentContent == null}">
-    No File
-    </span>
-  </td>
+                    <td th:text="${d.id}"></td>
 
-</tr>
-</tbody>
+                    <td th:text="${d.vendor.ledgerName}"></td>
 
-</table>
+                    <td th:text="${d.amount}"></td>
+
+                    <td th:text="${d.reference}"></td>
+
+                    <td th:text="${d.status}"></td>
+                    <td>
+                        @{/api/v1/payable-invoice/download/{id}(id=${d.id})}
+                        Download
+                        </a>
+
+                        <span th:if="${d.documentContent == null}">
+                No File
+            </span>
+                    </td>
+
+
+                </tr>
+                </tbody>
+            </table>
+            <br/>
+
+
+        </div>
+    </div>
+</div>
+
 
 </body>
 </html>
+
