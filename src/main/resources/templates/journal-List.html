@@ -43,7 +43,9 @@
                     <th>toAccount</th>
                     <th>description</th>
                     <th>amount</th>
-                </tr>
+                    <th>Payable Invoice Ref</th>
+
+            </tr>
 
                 <tr th:each="journal : ${journalList}">
 
@@ -62,6 +64,8 @@
                     <td th:text="${journal.getTargetAccount().getLedgerName()}"></td>
                     <td th:text="${journal.getDescription()}"></td>
                     <td th:text="${journal.getAmount()}"></td>
+                    <td th:text="${journal.payableInvoice != null ? journal.payableInvoice.id : ''}"></td>
+
                 </tr>
             </table>
 

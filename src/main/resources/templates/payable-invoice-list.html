@@ -61,6 +61,7 @@
                     <td th:text="${d.reference}"></td>
 
                     <td th:text="${d.status}"></td>
+
                     <td>
                         <a th:if="${d.hasFile}" th:href="@{/api/v1/payable-invoice/download/{id}(id=${d.id})}"/>
 

@@ -111,6 +111,21 @@
 
 
                 <div class="form-group">
+                    <label>Select Payable Invoice</label>
+
+                    <select th:field="*{journal.payableInvoice}" class="form-control">
+
+                        <option value="">-- Select Invoice --</option>
+
+                        <option th:each="p : ${payableInvoices}"
+                                th:value="${p.id}"
+                                th:text="${p.reference + ' - $' + p.amount}">
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <button type="submit" class="btn btn-success">Submit</button>
                 </div>
             </form>

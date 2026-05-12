@@ -32,6 +32,13 @@ public class JournalEntry {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate transactionDate;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payable_invoice_id")
+    private PayableInvoice payableInvoice;
+
+
+
     public String getId() {
         return id;
     }
@@ -78,5 +85,13 @@ public class JournalEntry {
 
     public void setTransactionDate(LocalDate transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public PayableInvoice getPayableInvoice() {
+        return payableInvoice;
+    }
+
+    public void setPayableInvoice(PayableInvoice payableInvoice) {
+        this.payableInvoice = payableInvoice;
     }
 }

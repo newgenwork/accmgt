@@ -46,6 +46,9 @@ public class PayableInvoiceController {
         model.addAttribute("invoice", pi);
         model.addAttribute("vendors",
                 ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
+
+
+
         return "payable-invoice-add";
     }
 
@@ -57,6 +60,8 @@ public class PayableInvoiceController {
 
         model.addAttribute("vendors",
                 ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
+
+
         return "payable-invoice-add";
     }
 

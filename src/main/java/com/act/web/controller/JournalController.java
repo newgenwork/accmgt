@@ -7,10 +7,7 @@ import com.act.json.model.LocalDateAdapter;
 import com.act.model.JournalEntry;
 import com.act.model.Ledger;
 import com.act.model.PayableInvoice;
-import com.act.repo.JournalEntryRepository;
-import com.act.repo.LedgerRepository;
-import com.act.repo.SequenceRepository;
-import com.act.repo.TrasactionRepository;
+import com.act.repo.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +28,8 @@ public class JournalController {
     private final LedgerRepository ledgerRepository;
     private final SequenceRepository sequenceRepository;
     private final TrasactionRepository trasactionRepository;
+    private final PayableInvoiceRepository payableInvoiceRepository;
+
     @Autowired
     private TransactionUtil transactionUtil;
 
@@ -38,16 +37,18 @@ public class JournalController {
             JournalEntryRepository journalEntryRepository,
             LedgerRepository ledgerRepository,
             TrasactionRepository trasactionRepository,
-            SequenceRepository sequenceRepository
+            SequenceRepository sequenceRepository, PayableInvoiceRepository payableInvoiceRepository
     ) {
         this.journalEntryRepository = journalEntryRepository;
         this.ledgerRepository = ledgerRepository;
         this.trasactionRepository = trasactionRepository;
         this.sequenceRepository = sequenceRepository;
+        this.payableInvoiceRepository = payableInvoiceRepository;
     }
 
     /* ================= ADD ================= */
 
+    @Transactional
     @GetMapping("/add")
     public String showAddJournalForm(Model model) {
         JournalEntry je = new JournalEntry();
@@ -63,11 +64,17 @@ public class JournalController {
                 "clients",retclients
         );
 
+        List<PayableInvoice> invoices =
+                payableInvoiceRepository.findByStatus("SUBMITTED");
+
+        model.addAttribute("payableInvoices", invoices);
+
         return "journal-add";
     }
 
     /* ================= EDIT ================= */
 
+    @Transactional
     @GetMapping("/edit/{id}")
     public String showEditJournalForm(
             @PathVariable String id,
@@ -81,6 +88,11 @@ public class JournalController {
                 "clients",
                 ledgerRepository.findByTypeAndIsJournalEntryPossible("Expense", "Y").get()
         );
+
+        List<PayableInvoice> invoices =
+                payableInvoiceRepository.findByStatus("SUBMITTED");
+
+        model.addAttribute("payableInvoices", invoices);
 
         return "journal-add";
     }
@@ -131,7 +143,23 @@ public class JournalController {
             je.setType(journalEntry.getType());
             je.setDescription(journalEntry.getDescription());
 
+            if (je.getPayableInvoice()==null || !je.getPayableInvoice().getId().equals(journalEntry.getPayableInvoice().getId())){
+
+                if (je.getPayableInvoice()!=null) {
+                    Optional<PayableInvoice> aa = payableInvoiceRepository.findById(je.getPayableInvoice().getId());
+                    aa.get().setStatus("SUBMITTED");
+                    payableInvoiceRepository.save(aa.get());
+                }
+
+                Optional<PayableInvoice> bb = payableInvoiceRepository.findById(journalEntry.getPayableInvoice().getId());
+                bb.get().setStatus("PAID");
+                payableInvoiceRepository.save(bb.get());
+                je.setPayableInvoice(journalEntry.getPayableInvoice());
+            }
+
+
             journalEntryRepository.save(je);
+
 
             transactionUtil. updateBalanceandTransaction(je.getAmount(), null, null,
                     je,
