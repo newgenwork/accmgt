@@ -12,7 +12,7 @@ public interface LedgerRepository extends JpaRepository<Ledger, Long> {
     Optional<Ledger> findByLedgerName(String ledgerName);
 
     Optional<List<Ledger>> findByIsEmployeeAndType(String isEmployee, String type);
-    Optional<List<Ledger>> findByIsEmployeeAndTypeAndLabel(String isEmployee, String type, String label);
+    List<Ledger> findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc(String isEmployee, String type, String label);
 
     Optional<List<Ledger>> findByType(String type);
     Optional<List<Ledger>> findByTypeAndIsJournalEntryPossible(String type, String isJournalEntryPossible);

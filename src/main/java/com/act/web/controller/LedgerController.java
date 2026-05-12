@@ -4,22 +4,16 @@ package com.act.web.controller;
 import com.act.dto.DateRange;
 import com.act.dto.LedgerDto;
 import com.act.dto.TransactionDto;
-import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
-import com.act.json.model.LocalDateAdapter;
 import com.act.model.Ledger;
 import com.act.model.LedgerDocument;
 import com.act.model.TimeSheet;
 import com.act.model.Transaction;
 import com.act.repo.LedgerDocumentRepository;
-import com.act.repo.LedgerDocumentRepository;
 import com.act.repo.LedgerRepository;
 import com.act.repo.TimesheetRepository;
 import com.act.repo.TrasactionRepository;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +59,8 @@ public class LedgerController {
         Optional<Ledger> t = ledgerRepository.findById(id);
         model.addAttribute("ledger", t.get());
 
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
         return "ledger-add";
     }
     @GetMapping("/statement/{id}")
@@ -117,8 +111,8 @@ public class LedgerController {
         //ledger.setId(sequenceRepository.getNextInvoiceSequence());
         model.addAttribute("ledger", new Ledger());
 
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
         return "ledger-add";
     }
 

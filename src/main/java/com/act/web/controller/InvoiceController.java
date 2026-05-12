@@ -3,22 +3,15 @@ package com.act.web.controller;
 
 import com.act.dto.InvoiceFilter;
 import com.act.dto.InvoiceMasterDto;
-import com.act.json.model.Config;
 import com.act.json.model.Event;
 import com.act.json.model.EventAction;
-import com.act.json.model.LocalDateAdapter;
 import com.act.model.*;
 import com.act.repo.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -69,8 +62,8 @@ public class InvoiceController {
 
         model.addAttribute("invoiceMaster", t.get());
 
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
         Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
 
@@ -90,8 +83,8 @@ public class InvoiceController {
         invoiceMaster.setStatus("DRAFT");
         model.addAttribute("invoiceMaster", invoiceMaster);
 
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
         Optional<List<Ledger>> employees = ledgerRepository.findByIsEmployeeAndType("Y", "Expense");
         model.addAttribute("employees", employees.get());
 
@@ -103,8 +96,8 @@ public class InvoiceController {
     @GetMapping("/filter")
     public String showAddInvoiceFilterForm(Model model) {
         model.addAttribute("invoiceFilter", new InvoiceFilter());
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
 
         return "invoiceMaster-filter";
     }

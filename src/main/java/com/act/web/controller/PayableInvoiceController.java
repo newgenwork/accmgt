@@ -1,6 +1,5 @@
 package com.act.web.controller;
 
-import com.act.model.Ledger;
 import com.act.model.PayableInvoice;
 import com.act.repo.LedgerRepository;
 import com.act.repo.PayableInvoiceRepository;
@@ -11,8 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -45,7 +42,7 @@ public class PayableInvoiceController {
         pi.setStatus("DRAFT");
         model.addAttribute("invoice", pi);
         model.addAttribute("vendors",
-                ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
+                ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Expense", "vendor"));
 
 
 
@@ -59,7 +56,7 @@ public class PayableInvoiceController {
         model.addAttribute("invoice", t.get());
 
         model.addAttribute("vendors",
-                ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Expense", "vendor").get());
+                ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Expense", "vendor"));
 
 
         return "payable-invoice-add";

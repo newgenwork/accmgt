@@ -151,10 +151,12 @@ public class JournalController {
                     payableInvoiceRepository.save(aa.get());
                 }
 
-                Optional<PayableInvoice> bb = payableInvoiceRepository.findById(journalEntry.getPayableInvoice().getId());
-                bb.get().setStatus("PAID");
-                payableInvoiceRepository.save(bb.get());
-                je.setPayableInvoice(journalEntry.getPayableInvoice());
+                if (journalEntry.getPayableInvoice() !=null) {
+                    Optional<PayableInvoice> bb = payableInvoiceRepository.findById(journalEntry.getPayableInvoice().getId());
+                    bb.get().setStatus("PAID");
+                    payableInvoiceRepository.save(bb.get());
+                    je.setPayableInvoice(journalEntry.getPayableInvoice());
+                }
             }
 
 

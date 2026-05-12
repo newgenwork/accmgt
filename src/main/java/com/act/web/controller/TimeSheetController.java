@@ -1,6 +1,5 @@
 package com.act.web.controller;
 
-import com.act.dto.InvoiceFilter;
 import com.act.dto.TimesheetFilter;
 import com.act.model.Ledger;
 import com.act.model.TimeSheet;
@@ -37,8 +36,8 @@ public class TimeSheetController {
     public String showAddTimesheetForm(Model model) {
         model.addAttribute(
                 "employees",
-                ledgerRepository.findByIsEmployeeAndTypeAndLabel(
-                        "Y", "Expense", "employee").get());
+                ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc(
+                        "Y", "Expense", "employee"));
         model.addAttribute("timesheet", new TimeSheet());
         return "timesheet-add";
     }
@@ -96,8 +95,8 @@ public class TimeSheetController {
 
         model.addAttribute(
                 "employees",
-                ledgerRepository.findByIsEmployeeAndTypeAndLabel(
-                        "Y", "Expense", "employee").get());
+                ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc(
+                        "Y", "Expense", "employee"));
 
         Optional<TimeSheet> timeSheet = timesheetRepository.findById(timesheetId);
 
@@ -152,8 +151,8 @@ public class TimeSheetController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             Model model) {
         model.addAttribute("timesheetFilter", new TimesheetFilter());
-        Optional<List<Ledger>> clients = ledgerRepository.findByIsEmployeeAndTypeAndLabel("N", "Asset", "AR");
-        model.addAttribute("clients", clients.get());
+        List<Ledger>clients = ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc("N", "Asset", "AR");
+        model.addAttribute("clients", clients);
         return "timesheet-filter";
     }
 
