@@ -7,11 +7,22 @@ import com.act.model.Ledger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class Util {
 
+
+    static String formatAmount(BigDecimal amount) {
+        if (amount == null) return "0.00";
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(amount);
+    }
 
     public static Event getConfigEvent(Ledger ledger, String type) {
         Gson gson = new GsonBuilder()

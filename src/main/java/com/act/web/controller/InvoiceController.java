@@ -288,9 +288,7 @@ public class InvoiceController {
             if (action.equals("receivePayment") && !invoiceMaster.getStatus().equals("SUBMITTED")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
-            if (action.equals("save")) {
-                invoiceMaster.setStatus("DRAFT");
-            }
+
             if (action.equals("submit")) {
                 invoiceMaster.setStatus("SUBMITTED");
             }
@@ -349,12 +347,16 @@ public class InvoiceController {
                 return "redirect:/api/v1/invoicesMaster/list?success=" + refs   ;
             }
             else {
+                if (action.equals("save")) {
+                    invoiceMaster.setStatus("DRAFT");
+                }
                 invoiceMasterEdit = new InvoiceMaster();
                 invoiceMasterEdit.setClient(invoiceMaster.getClient());
                 invoiceMasterEdit.setReference(invoiceMaster.getReference());
                 invoiceMasterEdit.setInvoiceDate(invoiceMaster.getInvoiceDate());
                 invoiceMasterEdit.setStatus(invoiceMaster.getStatus());
                 invoiceMasterEdit.setReceivedDate(invoiceMaster.getReceivedDate());
+
                 //invoiceMasterEdit.setId(invoiceMaster.getId());
 
                 long line = 0;
@@ -686,9 +688,9 @@ public class InvoiceController {
         headerTable.addCell(leftNoBorderCell(
                 invoice.getClient().getCompanyName()));
 
-        headerTable.addCell(leftNoBorderCell("Client Address:"));
+        headerTable.addCell(leftNoBorderCell("Address:"));
         headerTable.addCell(leftNoBorderCell(
-                invoice.getClient().getCompanyAddress()));
+                invoice.getClient().getCompanyAddress()==null?"":invoice.getClient().getCompanyAddress()));
 
         document.add(headerTable);
 
@@ -697,6 +699,7 @@ public class InvoiceController {
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10);
+
 
         table.addCell("Quantity");
         table.addCell("Description");
@@ -717,7 +720,8 @@ public class InvoiceController {
                             d.getEndDate().format(dateFormatter)
             );
             table.addCell(d.getRate().toString());
-            table.addCell(d.getAmount().toString());
+
+            table.addCell(rightCell(Util.formatAmount(d.getAmount())));
 
             if (d.getAmount() != null) {
                 totalAmount = totalAmount.add(d.getAmount());
@@ -733,9 +737,12 @@ public class InvoiceController {
         totalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalLabelCell.setPadding(8);
 
+
         PdfPCell totalValueCell = new PdfPCell(
-                new Phrase(totalAmount.toString(), totalFont));
+                new Phrase(Util.formatAmount(totalAmount), totalFont));
+
         totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
         totalValueCell.setPadding(8);
 
         table.addCell(totalLabelCell);
@@ -747,6 +754,13 @@ public class InvoiceController {
     }
 
     /* ================= UTILITY ================= */
+
+    private PdfPCell rightCell(String text) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setPadding(5);
+        return cell;
+    }
 
     private PdfPCell leftNoBorderCell(String text) {
         PdfPCell cell = new PdfPCell(new Phrase(text));
