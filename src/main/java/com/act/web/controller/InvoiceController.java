@@ -288,6 +288,9 @@ public class InvoiceController {
             if (action.equals("receivePayment") && !invoiceMaster.getStatus().equals("SUBMITTED")) {
                 return "redirect:/api/v1/invoicesMaster/list?success";
             }
+            if (action.equals("save")) {
+                invoiceMaster.setStatus("DRAFT");
+            }
             if (action.equals("submit")) {
                 invoiceMaster.setStatus("SUBMITTED");
             }
