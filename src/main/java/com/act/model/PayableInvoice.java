@@ -36,7 +36,7 @@ public class PayableInvoice {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "document_content", nullable = false)
+    @Column(name = "document_content", nullable = true)
     private byte[] documentContent;
 
 
@@ -49,6 +49,11 @@ public class PayableInvoice {
 
     @Column(length = 100)
     private String status; //SUBMITTED or PAID or DECLINED
+
+    @Column(length = 100)
+    private String documentLink; //SUBMITTED or PAID or DECLINED
+
+
 
     public String getFileName() {
         return fileName;
@@ -142,4 +147,11 @@ public class PayableInvoice {
         return documentContent != null && documentContent.length>0;
     }
 
+    public String getDocumentLink() {
+        return documentLink;
+    }
+
+    public void setDocumentLink(String documentLink) {
+        this.documentLink = documentLink;
+    }
 }
