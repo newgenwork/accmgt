@@ -434,6 +434,19 @@ public class LedgerController {
         return "ledger-documents";
     }
 
+    @GetMapping("/documents/expiring-soon")
+    public String showExpiringDocuments(Model model) {
+
+        LocalDate today = LocalDate.now();
+        LocalDate fourMonthsLater = today.plusMonths(4);
+
+        List<LedgerDocument> docs =
+                ledgerDocumentRepository.findExpiringActiveDocs(today, fourMonthsLater);
+
+        model.addAttribute("documents", docs);
+
+        return "ledger-documents-expiring";
+    }
 
     /* ================= ADD ================= */
 

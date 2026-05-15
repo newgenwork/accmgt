@@ -3,6 +3,7 @@ package com.act.repo;
 
 import com.act.model.Ledger;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,5 +20,8 @@ public interface LedgerRepository extends JpaRepository<Ledger, Long> {
 
     Optional<List<Ledger>> findByIsEmployeeAndTypeAndInvoiceLedger(String isEmployee, String type ,Ledger invoiceLedger);
     List<Ledger> findAllByOrderByLedgerNameAsc();
+
+
+
 
 }
