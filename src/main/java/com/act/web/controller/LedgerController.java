@@ -258,7 +258,8 @@ public class LedgerController {
                     led.getLabel().equalsIgnoreCase("employee") &&
                     led.getInvoiceRateValidateFromDate()!=null &&
                     led.getInvoiceRateValidateToDate()!=null) {
-                List<DateRange> dateRanges = findMissingTimeSheetRanges(led, led.getInvoiceRateValidateFromDate(), LocalDate.now());
+                List<DateRange> dateRanges = findMissingTimeSheetRanges(led, led.getInvoiceRateValidateFromDate(),
+                        (LocalDate.now().isBefore(led.getInvoiceRateValidateToDate())) ? LocalDate.now():led.getInvoiceRateValidateToDate());
                 String result = dateRanges.stream()
                         .map(dr -> dr.getStartDate().format(dateFormatter) + " - " + dr.getEndDate().format(dateFormatter))
                         .collect(Collectors.joining("\n"));
