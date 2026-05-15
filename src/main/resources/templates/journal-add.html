@@ -25,7 +25,7 @@
                         var option = document.createElement("option");
 
                         option.value = inv.id;
-                        option.text = inv.reference + " - $" + inv.amount;
+                        option.text = "Ref: " + inv.reference + " : " + inv.desc + " - $" + inv.amount;
 
                         invoiceDropdown.appendChild(option);
                     });

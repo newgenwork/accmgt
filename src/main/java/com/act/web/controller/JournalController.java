@@ -64,10 +64,10 @@ public class JournalController {
                 "clients",retclients
         );
 
-        List<PayableInvoice> invoices =
+        /*List<PayableInvoice> invoices =
                 payableInvoiceRepository.findByStatus("SUBMITTED");
 
-        model.addAttribute("payableInvoices", invoices);
+        model.addAttribute("payableInvoices", invoices);*/
 
         return "journal-add";
     }
@@ -90,6 +90,7 @@ public class JournalController {
             Map<String, Object> map = new HashMap<>();
             map.put("id", p.getId());
             map.put("reference", p.getReference());
+            map.put("desc", p.getDescription());
             map.put("amount", p.getAmount());
             result.add(map);
         }
