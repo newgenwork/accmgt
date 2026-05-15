@@ -25,7 +25,16 @@
                         var option = document.createElement("option");
 
                         option.value = inv.id;
-                        option.text = "Ref: " + inv.reference + " : " + inv.desc + " - $" + inv.amount;
+
+                        const date = new Date(inv.recvDate);
+
+                        const formattedDate = date.toLocaleDateString('en-US', {
+                            month: '2-digit',   // Apr
+                            day: '2-digit',   // 15
+                            year: 'numeric'   // 2026
+                        });
+
+                        option.text = "Ref: " + inv.reference + " : " + inv.desc + " Received on : " + formattedDate + " - $" + inv.amount;
 
                         invoiceDropdown.appendChild(option);
                     });

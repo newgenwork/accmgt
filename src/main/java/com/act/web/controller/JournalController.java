@@ -92,6 +92,7 @@ public class JournalController {
             map.put("reference", p.getReference());
             map.put("desc", p.getDescription());
             map.put("amount", p.getAmount());
+            map.put("recvDate", p.getInvoiceReceiveDate());
             result.add(map);
         }
 
