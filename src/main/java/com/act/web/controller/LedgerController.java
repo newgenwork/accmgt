@@ -291,6 +291,9 @@ public class LedgerController {
         if (invoicePaymentEvent != null) {
             List<EventAction> listEventActions = invoicePaymentEvent.getEventConfig().getEventAction();
             Iterator<EventAction> itlistEventActions = listEventActions.iterator();
+            if (updateDto && LocalDate.now().isAfter(led.getInvoiceRateValidateToDate())) {
+                updateDto = false;
+            }
             if (updateDto) {
                 ledgerDto.setCompanyHourRate(led.getInvoiceRate());
             }
