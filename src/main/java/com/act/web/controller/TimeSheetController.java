@@ -12,9 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("api/v1/timesheet")
@@ -62,6 +60,10 @@ public class TimeSheetController {
             return "redirect:/api/v1/timesheet/list?error=Timesheet date range overlaps";
         }
 
+        if (timeSheet.getEmployee().getInvoiceRateValidateToDate().isBefore(timeSheet.getEndDate())){
+            return "redirect:/api/v1/timesheet/list?error=Invalid date range more than last configured InvoiceRateValidateToDate";
+        }
+
         // ✅ Edit existing
         if (timeSheet.getId() != null) {
             Optional<TimeSheet> existing = timesheetRepository.findById(timeSheet.getId());
@@ -84,6 +86,38 @@ public class TimeSheetController {
         // ✅ New insert
         timesheetRepository.save(timeSheet);
         return "redirect:/api/v1/timesheet/list?success=added";
+    }
+
+    @GetMapping("/employees/by-date")
+    @ResponseBody
+    public List<Map<String, Object>> getEmployeesByDate(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<Ledger> employees =
+                ledgerRepository.findByIsEmployeeAndTypeAndLabelOrderByLedgerNameAsc(
+                        "Y", "Expense", "employee");
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Ledger e : employees) {
+
+            // ✅ VALIDATION LOGIC
+            if (e.getInvoiceRateValidateToDate() != null &&
+                    e.getInvoiceRateValidateToDate().isBefore(end)) {
+                continue; // ❌ skip invalid contractor
+            }
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", e.getId());
+            map.put("name", e.getLedgerName());
+
+            result.add(map);
+        }
+
+        return result;
     }
 
     /* ================= EDIT ================= */
