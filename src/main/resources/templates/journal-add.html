@@ -5,6 +5,35 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script>
+        function loadInvoices() {
+
+            var vendorId = document.getElementById("toAccountRequested").value;
+
+            var invoiceDropdown = document.getElementById("invoiceDropdown");
+
+            // ✅ clear dropdown
+            invoiceDropdown.innerHTML = "<option value=''>-- Select Invoice --</option>";
+
+            if (!vendorId) return;
+
+            fetch("/api/v1/journal/invoices/by-vendor/" + vendorId)
+                .then(res => res.json())
+                .then(data => {
+
+                    data.forEach(inv => {
+                        var option = document.createElement("option");
+
+                        option.value = inv.id;
+                        option.text = inv.reference + " - $" + inv.amount;
+
+                        invoiceDropdown.appendChild(option);
+                    });
+
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -61,18 +90,22 @@
                     <label class="control-label" for="toAccountRequested">
                         to Account
                     </label>
+
+
+
                     <select id="toAccountRequested"
                             class="form-control"
                             th:field="*{journal.targetAccount}"
+                            onchange="loadInvoices()"
                             required>
-                        <option value="" disabled selected>
-                            -- Select From Account --
-                        </option>
+
+                        <option value="">-- Select Vendor --</option>
 
                         <option th:each="c : ${clients}"
                                 th:value="${c.id}"
                                 th:text="${c.ledgerName}">
                         </option>
+
                     </select>
 
                     <small class="text-danger"
@@ -113,16 +146,15 @@
                 <div class="form-group">
                     <label>Select Payable Invoice</label>
 
-                    <select th:field="*{journal.payableInvoice}" class="form-control">
+
+                    <select id="invoiceDropdown"
+                            th:field="*{journal.payableInvoice}"
+                            class="form-control">
 
                         <option value="">-- Select Invoice --</option>
 
-                        <option th:each="p : ${payableInvoices}"
-                                th:value="${p.id}"
-                                th:text="${p.reference + ' - $' + p.amount}">
-                        </option>
-
                     </select>
+
                 </div>
 
                 <div class="form-group">

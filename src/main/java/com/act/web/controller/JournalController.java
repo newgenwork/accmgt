@@ -72,6 +72,32 @@ public class JournalController {
         return "journal-add";
     }
 
+
+    @Transactional
+    @GetMapping("/invoices/by-vendor/{vendorId}")
+    @ResponseBody
+    public List<Map<String, Object>> getInvoicesByVendor(@PathVariable Long vendorId) {
+
+        Ledger vendor = ledgerRepository.findById(vendorId).orElseThrow();
+
+        List<PayableInvoice> invoices =
+                payableInvoiceRepository.findByVendorAndStatus(vendor, "SUBMITTED");
+
+        // ✅ Convert to lightweight JSON
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (PayableInvoice p : invoices) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", p.getId());
+            map.put("reference", p.getReference());
+            map.put("amount", p.getAmount());
+            result.add(map);
+        }
+
+        return result;
+    }
+
+
     /* ================= EDIT ================= */
 
     @Transactional
