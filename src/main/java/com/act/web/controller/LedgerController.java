@@ -182,15 +182,18 @@ public class LedgerController {
             @RequestParam(name = "label", required = false) String label,
             @RequestParam(name = "endClient", required = false) String endClient,
             @RequestParam(name = "invoiceLedger", required = false) String invoiceLedger,
+            //0==>include no expired ledger, 1==>include all, 2==> only expired
+            @RequestParam(name = "includeExpiredLedger", required = false, defaultValue = "0") String includeExpiredLedger,
             @RequestParam(name = "viewName", required = false, defaultValue = "ledger-List") String viewName,
             HttpSession session,
-            Model model, Map map) {
+            Model model) {
 
         Map<String, String > mapParams =new HashMap<>();
         mapParams.put("label", label);
         mapParams.put("endClient", endClient);
         mapParams.put("invoiceLedger", invoiceLedger);
         mapParams.put("viewName", viewName);
+        mapParams.put("includeExpiredLedger", includeExpiredLedger);
         session.setAttribute("lastLedgerQuery", mapParams);
 
         DateTimeFormatter dateFormatter =
@@ -217,6 +220,17 @@ public class LedgerController {
 
             if (invoiceLedger !=null & led.getInvoiceLedger() != null &&  !led.getInvoiceLedger().getLedgerName().equals(invoiceLedger)) {
                 continue;
+            }
+
+            if (includeExpiredLedger.equalsIgnoreCase("0")) {
+                if (led.getInvoiceRateValidateToDate()!=null && LocalDate.now().isAfter(led.getInvoiceRateValidateToDate())) {
+                    continue;
+                }
+            }
+            if (includeExpiredLedger.equalsIgnoreCase("2")) {
+                if (led.getInvoiceRateValidateToDate()!=null && !LocalDate.now().isAfter(led.getInvoiceRateValidateToDate())) {
+                    continue;
+                }
             }
             LedgerDto dto = new LedgerDto();
             dto.setId(led.getId());

@@ -37,6 +37,9 @@
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee}">View Ledger (only Employees)</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=employee&includeExpiredLedger=2}">View Ledger (only Contract Completed Employees)</a></li>
+				</ul>
+				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/ledger/list?label=AP}">View Ledger (only AP)</a></li>
 				</ul>
 
