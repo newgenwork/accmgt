@@ -87,7 +87,9 @@
 				----
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Manage Journals</a></li>
-					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Pending Journals for W2 and 1099 (Under Construction)</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Pending Journals Before Client Payment (Under Construction)</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Pending Journals After Client Payment (Under Construction)</a></li>
+
 				</ul>
 
 				----
