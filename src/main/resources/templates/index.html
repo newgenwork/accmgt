@@ -87,6 +87,7 @@
 				----
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Manage Journals</a></li>
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/journal/list}">Pending Journals for W2 and 1099 (Under Construction)</a></li>
 				</ul>
 
 				----
@@ -98,8 +99,15 @@
 				<ul class="nav navbar-nav">
 					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/list}">Manage Accounts Payable Invoice</a></li>
 				</ul>
-
-
+				----
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/list}">Expiring Documents (Under Construction)</a></li>
+				</ul>
+				----
+				<ul class="nav navbar-nav">
+					<li sec:authorize="isAuthenticated()"><a th:href="@{/api/v1/payable-invoice/list}">Manage Tasks (Under Construction)</a></li>
+				</ul>
+				----
 			</div>
 		</div>
 	</div>
